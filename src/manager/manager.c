@@ -41,7 +41,7 @@ int updateName(int id, char* new_name) {
 }
 
 int updateArticle(int id, double new_price) {
-    int artigos = open("ARTIGOS", O_RDWR | O_CREAT, 00700);
+    int artigos = open("ARTIGOS", O_RDWR);
     Artigo a;
     pread(artigos, &a, sizeof(Artigo), id * sizeof(Artigo));
     a.price = new_price;
