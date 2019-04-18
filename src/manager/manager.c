@@ -1,18 +1,10 @@
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "manager.h"
-
-#define OFFSET(x) x/sizeof(Artigo)
-#define SPOT(x) x * sizeof(Artigo)
-
-typedef struct artigo {
-    size_t name;
-    double price;
-} Artigo;
+#include "article.h"
+#include "../utils/utils.h"
 
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
@@ -37,12 +29,12 @@ static int updateName(int id, char* new_name) {
     strings = open("STRINGS", O_WRONLY | O_APPEND);
     artigos = open("ARTIGOS", O_RDWR);
     fstat(artigos, &b);
-    if(SPOT(id) > b.st_size) return -1;
-    pread(artigos, &a, sizeof(Artigo), id * sizeof(Artigo));
+    if(SPOT(id) >= b.st_size) return -1;
+    pread(artigos, &a, sizeof(Artigo), SPOT(id));
     fstat(strings, &b);
     a.name = b.st_size;
     strtok(new_name, "\n");
-    pwrite(artigos, &a, sizeof(Artigo), id * sizeof(Artigo));
+    pwrite(artigos, &a, sizeof(Artigo), SPOT(id));
     write(strings, new_name, strlen(new_name) + 1);
     return 0;
 }
@@ -51,45 +43,12 @@ static int updateArticle(int id, double new_price) {
     int artigos = open("ARTIGOS", O_RDWR);
     struct stat b;
     fstat(artigos, &b);
-    if(SPOT(id) > b.st_size) return -1;
+    if(SPOT(id) >= b.st_size) return -1;
     Artigo a;
-    pread(artigos, &a, sizeof(Artigo), id * sizeof(Artigo));
+    pread(artigos, &a, sizeof(Artigo), SPOT(id));
     a.price = new_price;
-    pwrite(artigos, &a, sizeof(Artigo), id * sizeof(Artigo));
+    pwrite(artigos, &a, sizeof(Artigo), SPOT(id));
     return 0;
-}
-
-char* getArticleName(int id) {
-    char* buff = malloc(100);
-    Artigo a;
-    int artigos = open("ARTIGOS", O_RDONLY);
-    struct stat b;
-    fstat(artigos, &b);
-    if(SPOT(id) > b.st_size) return NULL;
-    pread(artigos, &a, sizeof(Artigo), id * sizeof(Artigo));
-    close(artigos);
-    int strings = open("STRINGS", O_RDONLY);
-    pread(strings, buff, 100, a.name);
-    return buff;
-}
-
-double getArticlePrice(int id) {
-    Artigo a;
-    int artigos = open("ARTIGOS", O_RDONLY);
-    struct stat b;
-    fstat(artigos, &b);
-    if(SPOT(id) > b.st_size) return -1;
-    pread(artigos, &a, sizeof(Artigo), id * sizeof(Artigo));
-    close(artigos);
-    return a.price;
-}
-
-static ssize_t readln(int fildes, void *buff, size_t nbyte) {
-    size_t i;
-    ssize_t r;
-    for(i = 0; (r = read(fildes, buff+i,1)) > 0 && i < nbyte && *(char*)(buff+i) != '\n'; i++);
-    if(*(char*)(buff+i) == '\n' && r) i++;
-    return i;
 }
 
 int main() {
@@ -117,14 +76,6 @@ int main() {
                 price = atof(strtok(NULL, " "));
                 updateArticle(id, price);
                 break;
-            case 'c':
-                strtok(buff, " ");
-                id = atoi(strtok(NULL, " "));
-                price = getArticlePrice(id);
-                id = sprintf(tmp, "%.2f\n", price);
-                write(1, tmp, id);
-                break;
         }
     return 0;
 }
-

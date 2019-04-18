@@ -1,9 +1,8 @@
 ############################# Makefile ##########################
 CFLAGS= -W -Wall -Wextra -O2
-
 UTILS=../utils
 DOC = ../docs
-OBJECTS:=$(patsubst %.c,%.o,$(wildcard *.c $(UTILS)/*.c))
+OBJECTS:= manager.o article.o ../utils/utils.o
 EXECUTAVEL=ma
 
 $(EXECUTAVEL): $(OBJECTS)
@@ -13,7 +12,11 @@ run:
 	./$(EXECUTAVEL)
 
 clean:
-	rm -rf *.o $(UTILS)/*.o $(EXECUTAVEL) $(DOC)
+	rm -rf ARTIGOS STRINGS $(EXECUTAVEL) *.o
 
 grind:
 	valgrind --leak-check=full --show-reachable=no --show-leak-kinds=all ./$(EXECUTAVEL)
+  
+article.o: article.c article.h
+manager.o: manager.c article.o ../utils/utils.o
+
