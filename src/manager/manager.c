@@ -94,7 +94,8 @@ static ssize_t readln(int fildes, void *buff, size_t nbyte) {
 
 int main() {
     char buff[200];
-    while(readln(1, buff, 200))
+    char tmp[200];
+    while(readln(0, buff, 200))
         switch(buff[0]) {
             case 'i':
                 strtok(buff, " ");
@@ -115,6 +116,13 @@ int main() {
                 id = atoi(strtok(NULL, " "));
                 price = atof(strtok(NULL, " "));
                 updateArticle(id, price);
+                break;
+            case 'c':
+                strtok(buff, " ");
+                id = atoi(strtok(NULL, " "));
+                price = getArticlePrice(id);
+                id = sprintf(tmp, "%.2f\n", price);
+                write(1, tmp, id);
                 break;
         }
     return 0;
