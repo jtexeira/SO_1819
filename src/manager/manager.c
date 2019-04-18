@@ -1,18 +1,9 @@
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "manager.h"
-
-#define OFFSET(x) x/sizeof(Artigo)
-#define SPOT(x) x * sizeof(Artigo)
-
-typedef struct artigo {
-    size_t name;
-    double price;
-} Artigo;
 
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
