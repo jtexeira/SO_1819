@@ -81,6 +81,13 @@ int main() {
             char* info = articleInfo(id, &size);
             write(1, info, size);
         }
+        else {
+            int quant = atoi(abc);
+            quant = updateStock(id, quant);
+            char quanti[100];
+            id = sprintf(quanti, "%d\n", quant);
+            write(1, quanti, id);
+        } 
     }
     return 0;
 }
