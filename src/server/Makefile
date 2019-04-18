@@ -2,7 +2,7 @@
 CFLAGS= -W -Wall -Wextra -O2
 UTILS=../utils
 DOC = ../docs
-OBJECTS:= server.o ../utils/utils.o ../manager/article.o
+OBJECTS:= server.o $(UTILS)/utils.o ../manager/article.o
 EXECUTAVEL=sv
 
 $(EXECUTAVEL): $(OBJECTS)
@@ -17,4 +17,4 @@ clean:
 grind:
 	valgrind --leak-check=full --show-reachable=no --show-leak-kinds=all ./$(EXECUTAVEL)
 
-server.o: server.c ../utils/utils.o ../manager/article.o
+server.o: server.c $(UTILS)/utils.o ../manager/article.o
