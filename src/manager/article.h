@@ -1,5 +1,5 @@
-#ifndef ___MANAGER_H___
-#define ___MANAGER_H___
+#ifndef ___ARTICLE_H___
+#define ___ARTICLE_H___
 
 #include <unistd.h>
 
@@ -11,8 +11,8 @@ typedef struct artigo {
     double price;
 } Artigo;
 
-char* getArticleName(int);
+char* getArticleName(int, int, int);
 
-double getArticlePrice(int);
+double getArticlePrice(int, int);
 
 #endif
