@@ -3,7 +3,7 @@ CFLAGS= -W -Wall -Wextra -O2
 
 UTILS=../utils
 DOC = ../docs
-OBJECTS:=$(patsubst %.c,%.o,$(wildcard *.c)) $(patsubst %.c,%.o,$(wildcard $(UTILS)/*.c))
+OBJECTS:=$(patsubst %.c,%.o,$(wildcard *.c $(UTILS)/*.c))
 EXECUTAVEL=sv
 
 $(EXECUTAVEL): $(OBJECTS)
