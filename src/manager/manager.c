@@ -8,8 +8,8 @@
 
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
-    strings = open("STRINGS", O_WRONLY | O_APPEND | O_CREAT, 00700);
-    artigos = open("ARTIGOS", O_WRONLY | O_APPEND | O_CREAT, 00700);
+    strings = open("strings", O_WRONLY | O_APPEND | O_CREAT, 00700);
+    artigos = open("artigos", O_WRONLY | O_APPEND | O_CREAT, 00700);
     struct stat a;
     fstat(strings, &a);
     write(strings, name, strlen(name) + 1);
@@ -26,8 +26,8 @@ static int updateName(int id, char* new_name) {
     int strings, artigos;
     Artigo a;
     struct stat b;
-    strings = open("STRINGS", O_WRONLY | O_APPEND);
-    artigos = open("ARTIGOS", O_RDWR);
+    strings = open("strings", O_WRONLY | O_APPEND);
+    artigos = open("artigos", O_RDWR);
     fstat(artigos, &b);
     if(SPOT(id) >= b.st_size) return -1;
     pread(artigos, &a, sizeof(Artigo), SPOT(id));
@@ -40,7 +40,7 @@ static int updateName(int id, char* new_name) {
 }
 
 static int updateArticle(int id, double new_price) {
-    int artigos = open("ARTIGOS", O_RDWR);
+    int artigos = open("artigos", O_RDWR);
     struct stat b;
     fstat(artigos, &b);
     if(SPOT(id) >= b.st_size) return -1;

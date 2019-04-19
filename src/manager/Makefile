@@ -6,7 +6,7 @@ $(EXECUTAVEL): $(OBJECTS)
 	cc $(CFLAGS) -o $(EXECUTAVEL) $(OBJECTS)
 
 clean:
-	rm -rf ARTIGOS STRINGS $(EXECUTAVEL) *.o
+	rm -rf artigos strings $(EXECUTAVEL) *.o
 
 article.o: article.c article.h
 manager.o: manager.c article.o ../utils/utils.o

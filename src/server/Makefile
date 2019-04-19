@@ -6,6 +6,6 @@ $(EXECUTAVEL): $(OBJECTS)
 	cc $(CFLAGS) -o $(EXECUTAVEL) $(OBJECTS)
 
 clean:
-	rm -rf STOCKS VENDAS $(EXECUTAVEL) *.o
+	rm -rf stocks vendas $(EXECUTAVEL) *.o
 
 server.o: server.c ../utils/utils.o ../manager/article.o
