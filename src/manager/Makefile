@@ -1,12 +1,21 @@
+############################# Makefile ##########################
 CFLAGS= -W -Wall -Wextra -O2
-EXECUTAVEL = ma
-OBJECTS:= manager.o article.o ../utils/utils.o
+UTILS=../utils
+DOC = ../docs
+OBJECTS:= manager.o article.o $(UTILS)/utils.o
+EXECUTAVEL=ma
 
 $(EXECUTAVEL): $(OBJECTS)
-	cc $(CFLAGS) -o $(EXECUTAVEL) $(OBJECTS)
+	cc -o $(EXECUTAVEL) $(OBJECTS) $(CFLAGS)
+
+run:
+	./$(EXECUTAVEL)
 
 clean:
 	rm -rf artigos strings $(EXECUTAVEL) *.o
 
+grind:
+	valgrind --leak-check=full --show-reachable=no --show-leak-kinds=all ./$(EXECUTAVEL)
+  
 article.o: article.c article.h
-manager.o: manager.c article.o ../utils/utils.o
+manager.o: manager.c article.o $(UTILS)/utils.o
