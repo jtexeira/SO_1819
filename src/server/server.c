@@ -66,39 +66,42 @@ int updateStock(int id, int new_stock) {
 }
 
 int main() {
-    int stock = open("stocks", O_RDONLY);
-    if(errno == ENOENT) {
-        close(stock);
-        stock = initF();
-        close(stock);
-    }
-    char buff[100];
-    int id, size = 0;
-    mkfifo("../pipes/rd", 0700);
-    mkfifo("../pipes/wr", 0700);
-    int rd = open("../pipes/rd", O_RDONLY);
-    int wr = open("../pipes/wr", O_WRONLY);
-    while(readln(rd, buff, 100)) {
-        id = atoi(strtok(buff, " "));
-        char* abc = strtok(NULL, " ");
-        if(!abc && buff[0] != '\n') {
-            char* info = articleInfo(id, &size);
-            if(!info)
+    if(!fork()) {
+        int stock = open("stocks", O_RDONLY);
+        if(errno == ENOENT) {
+            close(stock);
+            stock = initF();
+            close(stock);
+        }
+        char buff[100];
+        int id, size = 0;
+        mkfifo("../pipes/rd", 0700);
+        mkfifo("../pipes/wr", 0700);
+        int rd = open("../pipes/rd", O_RDONLY);
+        int wr = open("../pipes/wr", O_WRONLY);
+        while(readln(rd, buff, 100)) {
+            id = atoi(strtok(buff, " "));
+            char* abc = strtok(NULL, " ");
+            if(!abc && buff[0] != '\n') {
+                char* info = articleInfo(id, &size);
+                if(!info)
+                    write(wr, "\n", 2); 
+                else 
+                    write(wr, info, size);
+            }
+            else if(buff[0] != '\n') {
+                int quant = atoi(abc);
+                quant = updateStock(id, quant);
+                char quanti[100];
+                size = sprintf(quanti, "%d\n", quant);
+                write(wr, quanti, size);
+            }
+            else
                 write(wr, "\n", 2); 
-            else 
-                write(wr, info, size);
         }
-        else if(buff[0] != '\n') {
-            int quant = atoi(abc);
-            quant = updateStock(id, quant);
-            char quanti[100];
-            size = sprintf(quanti, "%d\n", quant);
-            write(wr, quanti, size);
-        }
-        else
-           write(wr, "\n", 2); 
+        unlink("../pipes/rd");
+        unlink("../pipes/wr");
+        return 0;
     }
-    unlink("../pipes/rd");
-    unlink("../pipes/wr");
     return 0;
 }
