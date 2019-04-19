@@ -1,11 +1,21 @@
+############################# Makefile ##########################
 CFLAGS= -W -Wall -Wextra -O2
-EXECUTAVEL = ma
+
+UTILS=../utils
+DOC = ../docs
 OBJECTS:= client.o ../utils/utils.o
+EXECUTAVEL=cv
 
 $(EXECUTAVEL): $(OBJECTS)
-	cc $(CFLAGS) -o $(EXECUTAVEL) $(OBJECTS)
+	cc -o $(EXECUTAVEL) $(OBJECTS) $(CFLAGS)
+
+run:
+	./$(EXECUTAVEL)
 
 clean:
-	rm -rf artigos strings $(EXECUTAVEL) *.o
+	rm -rf *.o $(UTILS)/*.o $(EXECUTAVEL) $(DOC)
 
+grind:
+	valgrind --leak-check=full --show-reachable=no --show-leak-kinds=all ./$(EXECUTAVEL)
+  
 client.o: client.c ../utils/utils.o
