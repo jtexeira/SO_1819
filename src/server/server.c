@@ -72,7 +72,9 @@ int main() {
     if(!fork()) {
         initF();
         char buff[100];
-        int id, size = 0;
+        int id, size;
+        size = sprintf(buff, "%d\n", getpid());
+        write(1, buff, size);
         mkfifo("../pipes/rd", 0700);
         mkfifo("../pipes/wr", 0700);
         int rd = open("../pipes/rd", O_RDONLY);
