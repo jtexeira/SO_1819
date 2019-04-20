@@ -13,7 +13,7 @@ typedef struct stock {
     ssize_t stock;
 } Stock;
 
-int initF() {
+void initF() {
     struct stat a;
     int i;
     Stock new;
@@ -27,14 +27,14 @@ int initF() {
         pwrite(stock, &new, sizeof(Stock), i * sizeof(Stock));
     }
     close(artigos);
-    return stock;
+    close(stock);
 }
 
 char* articleInfo(int id, int* size) {
     int stock = open("stocks", O_RDONLY);
     struct stat info;
     fstat(stock, &info);
-    if(id * sizeof(Stock) >= info.st_size) return NULL;
+    if((id + 1) * sizeof(Stock) >= info.st_size) return NULL;
     char* buff = malloc(100);
     Stock s;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock));
@@ -51,7 +51,7 @@ ssize_t updateStock(int id, ssize_t new_stock) {
     Stock s;
     struct stat info;
     fstat(stock, &info);
-    if(id * sizeof(Stock) >= info.st_size) return -1;
+    if((id + 1) * sizeof(Stock) >= info.st_size) return -1;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock));
     s.stock += new_stock;
     pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock));
@@ -70,12 +70,7 @@ ssize_t updateStock(int id, ssize_t new_stock) {
 
 int main() {
     if(!fork()) {
-        int stock = open("stocks", O_RDONLY);
-        if(errno == ENOENT) {
-            close(stock);
-            stock = initF();
-            close(stock);
-        }
+        initF();
         char buff[100];
         int id, size = 0;
         mkfifo("../pipes/rd", 0700);
@@ -83,25 +78,24 @@ int main() {
         int rd = open("../pipes/rd", O_RDONLY);
         int wr = open("../pipes/wr", O_WRONLY);
         while(readln(rd, buff, 100)) {
-            char* ree = buff;
-            id = atoi(strtok(ree, " "));
+            if(buff[0] < '0' || buff[0] > '9') {
+                write(wr, "\n", 2);
+                continue;
+            }
+            id = atoi(strtok(buff, " "));
             char* abc = strtok(NULL, " ");
-            if(!abc && buff[0] != '\n') {
+            if(!abc) {
                 char* info = articleInfo(id, &size);
                 if(!info)
                     write(wr, "\n", 2); 
                 else 
                     write(wr, info, size + 1);
             }
-            else if(buff[0] != '\n') {
+            else {
                 ssize_t quant = atoi(abc);
-                quant = updateStock(id, quant);
-                char quanti[100];
-                size = sprintf(quanti, "%ld\n", quant);
-                write(wr, quanti, size + 1);
-            }
-            else
+                updateStock(id, quant);
                 write(wr, "\n", 2); 
+            }
         }
         close(rd);
         close(wr);
