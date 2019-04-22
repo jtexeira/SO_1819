@@ -1,9 +1,8 @@
 ############################# Makefile ##########################
 CFLAGS= -W -Wall -Wextra -O2
-
 UTILS=../utils
 DOC = ../docs
-OBJECTS:=$(patsubst %.c,%.o,$(wildcard *.c $(UTILS)/*.c))
+OBJECTS:= agreg.o $(UTILS)/utils.o
 EXECUTAVEL=ag
 
 $(EXECUTAVEL): $(OBJECTS)
@@ -13,7 +12,9 @@ run:
 	./$(EXECUTAVEL)
 
 clean:
-	rm -rf *.o $(UTILS)/*.o $(EXECUTAVEL) $(DOC)
+	rm -rf stocks vendas $(EXECUTAVEL) *.o
 
 grind:
 	valgrind --leak-check=full --show-reachable=no --show-leak-kinds=all ./$(EXECUTAVEL)
+
+agreg.o: agreg.c $(UTILS)/utils.o 
