@@ -69,22 +69,25 @@ ssize_t updateStock(int id, ssize_t new_stock) {
 }
 
 int main() {
-    if(!fork()) {
+    if(!fork())
+    {
         initF();
-        char buff[100];
+        char buff[150];
         int id, size;
         size = sprintf(buff, "%d\n", getpid());
         write(1, buff, size);
         mkfifo("../pipes/rd", 0700);
-        mkfifo("../pipes/wr", 0700);
         int rd = open("../pipes/rd", O_RDONLY);
-        int wr = open("../pipes/wr", O_WRONLY);
-        while(readln(rd, buff, 100)) {
+        while(readln(rd, buff, 150)) {
+            char* pid = strtok(buff, " ");
+            char path[100];
+            sprintf(path, "../pipes/%s", pid);
+            int wr = open(path, O_WRONLY);
             if(buff[0] < '0' || buff[0] > '9') {
                 write(wr, "\b\n", 2);
                 continue;
             }
-            id = atoi(strtok(buff, " "));
+            id = atoi(strtok(NULL, " "));
             char* abc = strtok(NULL, " ");
             if(!abc) {
                 char* info = articleInfo(id, &size);
@@ -95,14 +98,14 @@ int main() {
             }
             else {
                 ssize_t quant = atoi(abc);
-                updateStock(id, quant);
-                write(wr, "\b\n", 2); 
+                int stock = updateStock(id, quant);
+                size = sprintf(buff, "%d\n", stock);
+                write(wr, buff, size); 
             }
+            close(wr);
         }
         close(rd);
-        close(wr);
         unlink("../pipes/rd");
-        unlink("../pipes/wr");
         return 0;
     }
     return 0;
