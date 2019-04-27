@@ -61,7 +61,7 @@ ssize_t updateStock(int id, ssize_t new_stock) {
         double price = getArticlePrice(artigos, id);
         close(artigos);
         int read = sprintf(buff, "%d %zu %.2f\n", id, -new_stock, -new_stock * price);
-        write(vendas, buff, read + 1);
+        write(vendas, buff, read);
     }
     close(stock);
     close(vendas);
