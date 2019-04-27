@@ -83,11 +83,12 @@ int main() {
             char path[100];
             sprintf(path, "../pipes/%s", pid);
             int wr = open(path, O_WRONLY);
-            if(buff[0] < '0' || buff[0] > '9') {
+            char* cid = strtok(NULL, " ");
+            if(cid[0] < '0' || cid[0] > '9') {
                 write(wr, "\b\n", 2);
                 continue;
             }
-            id = atoi(strtok(NULL, " "));
+            id = atoi(cid);
             char* abc = strtok(NULL, " ");
             if(!abc) {
                 char* info = articleInfo(id, &size);
