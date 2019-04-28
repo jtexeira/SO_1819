@@ -53,7 +53,7 @@ static int updateArticle(int id, double new_price) {
 
 int main() {
     char buff[200];
-    char tmp[200];
+    char* tmp;
     while(readln(0, buff, 200))
         switch(buff[0]) {
             case 'i':
@@ -71,7 +71,11 @@ int main() {
                 updateName(id, name);
                 break;
             case 'p':
-                strtok(buff, " ");
+                mkfifo("/tmp/article.pipe", 00700);
+                int pipe = open("/tmp/article.pipe", 00700);
+                tmp = strtok(buff, " ");
+                write(pipe, tmp, sizeof(tmp));
+                close(pipe);
                 id = atoi(strtok(NULL, " "));
                 price = atof(strtok(NULL, " "));
                 updateArticle(id, price);
