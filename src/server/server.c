@@ -69,6 +69,16 @@ ssize_t updateStock(int id, ssize_t new_stock) {
 }
 
 int main() {
+    int idk[2];
+    pipe(idk);
+    if(!fork()) {
+        for(;;) {
+            int article = open("/tmp/article.pipe", O_RDONLY);
+            int read;
+            char buff[100];
+            while((read = readln(article, buff, 100)));
+        }
+    }
     if(!fork())
     {
         initF();
@@ -77,35 +87,37 @@ int main() {
         size = sprintf(buff, "%d\n", getpid());
         write(1, buff, size);
         mkfifo("/tmp/rd", 0700);
-        int rd = open("/tmp/rd", O_RDONLY);
-        while(readln(rd, buff, 150)) {
-            char* pid = strtok(buff, " ");
-            char path[100];
-            sprintf(path, "/tmp/%s", pid);
-            int wr = open(path, O_WRONLY);
-            char* cid = strtok(NULL, " ");
-            if(cid[0] < '0' || cid[0] > '9') {
-                write(wr, "\b\n", 2);
-                continue;
+        for(;;) {
+            int rd = open("/tmp/rd", O_RDONLY);
+            while(readln(rd, buff, 150)) {
+                char* pid = strtok(buff, " ");
+                char path[100];
+                sprintf(path, "/tmp/%s", pid);
+                int wr = open(path, O_WRONLY);
+                char* cid = strtok(NULL, " ");
+                if(cid[0] < '0' || cid[0] > '9') {
+                    write(wr, "\b\n", 2);
+                    continue;
+                }
+                id = atoi(cid);
+                char* abc = strtok(NULL, " ");
+                if(!abc) {
+                    char* info = articleInfo(id, &size);
+                    if(!info)
+                        write(wr, "\b\n", 2); 
+                    else 
+                        write(wr, info, size + 1);
+                }
+                else {
+                    ssize_t quant = atoi(abc);
+                    int stock = updateStock(id, quant);
+                    size = sprintf(buff, "%d\n", stock);
+                    write(wr, buff, size); 
+                }
+                close(wr);
             }
-            id = atoi(cid);
-            char* abc = strtok(NULL, " ");
-            if(!abc) {
-                char* info = articleInfo(id, &size);
-                if(!info)
-                    write(wr, "\b\n", 2); 
-                else 
-                    write(wr, info, size + 1);
-            }
-            else {
-                ssize_t quant = atoi(abc);
-                int stock = updateStock(id, quant);
-                size = sprintf(buff, "%d\n", stock);
-                write(wr, buff, size); 
-            }
-            close(wr);
+            close(rd);
         }
-        close(rd);
         unlink("/tmp/rd");
         return 0;
     }
