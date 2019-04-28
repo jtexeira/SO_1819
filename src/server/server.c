@@ -76,12 +76,12 @@ int main() {
         int id, size;
         size = sprintf(buff, "%d\n", getpid());
         write(1, buff, size);
-        mkfifo("../pipes/rd", 0700);
-        int rd = open("../pipes/rd", O_RDONLY);
+        mkfifo("/tmp/rd", 0700);
+        int rd = open("/tmp/rd", O_RDONLY);
         while(readln(rd, buff, 150)) {
             char* pid = strtok(buff, " ");
             char path[100];
-            sprintf(path, "../pipes/%s", pid);
+            sprintf(path, "/tmp/%s", pid);
             int wr = open(path, O_WRONLY);
             char* cid = strtok(NULL, " ");
             if(cid[0] < '0' || cid[0] > '9') {
@@ -106,7 +106,7 @@ int main() {
             close(wr);
         }
         close(rd);
-        unlink("../pipes/rd");
+        unlink("/tmp/rd");
         return 0;
     }
     return 0;
