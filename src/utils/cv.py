@@ -9,6 +9,7 @@ def main():
     MAX_ID = 2500
     if len(sys.argv) > 2:
         MAX_ID = int(sys.argv[2])
+
     for i in range(n):
         c = randint(0,1)
         v = [
