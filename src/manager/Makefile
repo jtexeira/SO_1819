@@ -7,12 +7,13 @@ EXECUTAVEL=ma
 
 $(EXECUTAVEL): $(OBJECTS)
 	cc -o $(EXECUTAVEL) $(OBJECTS) $(CFLAGS)
+	mv $(EXECUTAVEL) ..
 
 run:
 	./$(EXECUTAVEL)
 
 clean:
-	rm -rf artigos strings $(EXECUTAVEL) *.o
+	rm -rf artigos strings ../$(EXECUTAVEL) *.o
 
 grind:
 	valgrind --leak-check=full --show-reachable=no --show-leak-kinds=all ./$(EXECUTAVEL)

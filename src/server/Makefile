@@ -7,12 +7,13 @@ EXECUTAVEL=sv
 
 $(EXECUTAVEL): $(OBJECTS)
 	cc -o $(EXECUTAVEL) $(OBJECTS) $(CFLAGS)
+	mv $(EXECUTAVEL) ..
 
 run:
 	./$(EXECUTAVEL)
 
 clean:
-	rm -rf stocks vendas $(EXECUTAVEL) *.o
+	rm -rf stocks vendas ../$(EXECUTAVEL) *.o
 
 grind:
 	valgrind --leak-check=full --show-reachable=no --show-leak-kinds=all ./$(EXECUTAVEL)

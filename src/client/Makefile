@@ -8,12 +8,13 @@ EXECUTAVEL=cv
 
 $(EXECUTAVEL): $(OBJECTS)
 	cc -o $(EXECUTAVEL) $(OBJECTS) $(CFLAGS)
+	mv $(EXECUTAVEL) ..
 
 run:
 	./$(EXECUTAVEL)
 
 clean:
-	rm -rf *.o $(UTILS)/*.o $(EXECUTAVEL) $(DOC)
+	rm -rf *.o $(UTILS)/*.o ../$(EXECUTAVEL) $(DOC)
 
 grind:
 	valgrind --leak-check=full --show-reachable=no --show-leak-kinds=all ./$(EXECUTAVEL)
