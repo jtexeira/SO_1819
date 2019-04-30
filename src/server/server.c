@@ -18,26 +18,56 @@ void initF() {
     int i;
     Stock new;
     int artigos = open("artigos", O_RDONLY);
-    int stock = open("stocks", O_CREAT | O_WRONLY, 0700);
     fstat(artigos, &a);
-    int nArtigos = a.st_size / sizeof(Artigo);
-    for(i = 0; i < nArtigos; i++) {
-        new.codigo = i;
-        new.stock = 0;
-        pwrite(stock, &new, sizeof(Stock), i * sizeof(Stock));
+    int nArtigos = (a.st_size - sizeof(time_t)) / sizeof(Artigo);
+    time_t articleCreate;
+    read(artigos, &articleCreate, sizeof(time_t));
+    if(stat("stocks", &a)) {
+        int stock = open("stocks", O_CREAT | O_WRONLY | O_APPEND, 0700);
+        write(stock, &articleCreate, sizeof(time_t));
+        for(i = 0; i < nArtigos; i++) {
+            new.codigo = i;
+            new.stock = 0;
+            write(stock, &new, sizeof(Stock));
+        }
+        close(stock);
     }
-    close(artigos);
-    close(stock);
+    else {
+        int stock = open("stocks", O_RDONLY);
+        time_t stockDate;
+        read(stock, &stockDate, sizeof(time_t));
+        close(stock);
+        if(stockDate != articleCreate) {
+            stock = open("stocks", O_WRONLY | O_TRUNC | O_APPEND);
+            write(stock, &articleCreate, sizeof(time_t));
+            for(i = 0; i < nArtigos; i++) {
+                new.codigo = i;
+                new.stock = 0;
+                write(stock, &new, sizeof(Stock));
+            }
+            close(stock);
+        }
+        int nStock = (a.st_size - sizeof(time_t)) / sizeof(Stock);
+        if(nStock < nArtigos) { 
+            stock = open("stocks", O_WRONLY | O_APPEND);
+            for(i = nStock; i < nArtigos; i++) {
+                new.codigo = i;
+                new.stock = 0;
+                write(stock, &new, sizeof(Stock));
+            }
+        }
+        close(artigos);
+    }
 }
 
 char* articleInfo(int id, int* size) {
     int stock = open("stocks", O_RDONLY);
     struct stat info;
     fstat(stock, &info);
-    if((id + 1) * sizeof(Stock) >= info.st_size) return NULL;
+    if(id * sizeof(Stock) >= info.st_size) return NULL;
     char* buff = malloc(100);
     Stock s;
-    pread(stock, &s, sizeof(Stock), id * sizeof(Stock));
+    pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     int artigos = open("artigos", O_RDONLY);
     *size = sprintf(buff, "%zu %.2f\n", s.stock, getArticlePrice(artigos, id));
     close(artigos);
@@ -51,10 +81,10 @@ ssize_t updateStock(int id, ssize_t new_stock) {
     Stock s;
     struct stat info;
     fstat(stock, &info);
-    if((id + 1) * sizeof(Stock) >= info.st_size) return -1;
-    pread(stock, &s, sizeof(Stock), id * sizeof(Stock));
+    if(id * sizeof(Stock) >= info.st_size) return -1;
+    pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     s.stock += new_stock;
-    pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock));
+    pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     if(new_stock < 0) {
         char buff[200];
         int artigos = open("artigos", O_RDONLY);
@@ -97,6 +127,7 @@ int main() {
                 char* cid = strtok(NULL, " ");
                 if(cid[0] < '0' || cid[0] > '9') {
                     write(wr, "\b\n", 2);
+                    close(wr);
                     continue;
                 }
                 id = atoi(cid);

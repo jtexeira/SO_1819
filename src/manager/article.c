@@ -9,7 +9,7 @@ char* getArticleName(int strings, int artigos, int id) {
     struct stat b;
     fstat(artigos, &b);
     if(id * sizeof(Artigo) >= b.st_size) return NULL;
-    pread(artigos, &a, sizeof(Artigo), OFFSET(id));
+    pread(artigos, &a, sizeof(Artigo), SPOT(id));
     pread(strings, buff, 100, a.name);
     return buff;
 }
