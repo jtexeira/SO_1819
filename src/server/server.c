@@ -17,7 +17,7 @@ void initF() {
     struct stat a;
     int i;
     Stock new;
-    int artigos = open("../manager/artigos", O_RDONLY);
+    int artigos = open("artigos", O_RDONLY);
     int stock = open("stocks", O_CREAT | O_WRONLY, 0700);
     fstat(artigos, &a);
     int nArtigos = a.st_size / sizeof(Artigo);
@@ -38,7 +38,7 @@ char* articleInfo(int id, int* size) {
     char* buff = malloc(100);
     Stock s;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock));
-    int artigos = open("../manager/artigos", O_RDONLY);
+    int artigos = open("artigos", O_RDONLY);
     *size = sprintf(buff, "%zu %.2f\n", s.stock, getArticlePrice(artigos, id));
     close(artigos);
     close(stock);
@@ -57,7 +57,7 @@ ssize_t updateStock(int id, ssize_t new_stock) {
     pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock));
     if(new_stock < 0) {
         char buff[200];
-        int artigos = open("../manager/artigos", O_RDONLY);
+        int artigos = open("artigos", O_RDONLY);
         double price = getArticlePrice(artigos, id);
         close(artigos);
         int read = sprintf(buff, "%d %zu %.2f\n", id, -new_stock, -new_stock * price);
@@ -79,7 +79,7 @@ int main() {
             while((read = readln(article, buff, 100)));
         }
     }
-    if(!fork())
+    //if(!fork())
     {
         initF();
         char buff[150];

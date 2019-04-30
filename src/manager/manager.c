@@ -9,17 +9,26 @@
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
     strings = open("strings", O_WRONLY | O_APPEND | O_CREAT, 00700);
-    artigos = open("artigos", O_WRONLY | O_APPEND | O_CREAT, 00700);
     struct stat a;
     fstat(strings, &a);
     write(strings, name, strlen(name) + 1);
     close(strings);
     Artigo b = {a.st_size, price};
-    fstat(artigos, &a);
-    write(artigos, &b, sizeof(Artigo));
-    close(artigos);
-    id = a.st_size / sizeof(Artigo);
-    return id;
+    if(!stat("artigos", &a)) {
+        artigos = open("artigos", O_WRONLY | O_APPEND);
+        write(artigos, &b, sizeof(Artigo));
+        id = (a.st_size - sizeof(time_t)) / sizeof(Artigo);
+        close(artigos);
+    }
+    else {
+        artigos = open("artigos", O_WRONLY | O_APPEND | O_CREAT, 00700);
+        fstat(artigos, &a);
+        write(artigos, &(a.st_mtim.tv_sec), sizeof(time_t));
+        write(artigos, &b, sizeof(Artigo));
+        close(artigos);
+        id = 0;
+    }
+        return id;
 }
 
 static int updateName(int id, char* new_name) {
