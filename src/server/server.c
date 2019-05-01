@@ -64,7 +64,7 @@ char* articleInfo(int id, int* size) {
     int stock = open("stocks", O_RDONLY);
     struct stat info;
     fstat(stock, &info);
-    if(id * sizeof(Stock) >= info.st_size) return NULL;
+    if(((id * sizeof(Stock)) + sizeof(time_t)) >= info.st_size) return NULL;
     char* buff = malloc(100);
     Stock s;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
@@ -81,7 +81,7 @@ ssize_t updateStock(int id, ssize_t new_stock) {
     Stock s;
     struct stat info;
     fstat(stock, &info);
-    if(id * sizeof(Stock) >= info.st_size) return -1;
+    if(((id * sizeof(Stock)) + sizeof(time_t)) >= info.st_size) return -1;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     s.stock += new_stock;
     pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
@@ -101,6 +101,7 @@ ssize_t updateStock(int id, ssize_t new_stock) {
 int main() {
     int idk[2];
     pipe(idk);
+    /*
     if(!fork()) {
         for(;;) {
             int article = open("/tmp/article.pipe", O_RDONLY);
@@ -109,7 +110,8 @@ int main() {
             while((read = readln(article, buff, 100)));
         }
     }
-    //if(!fork())
+    */
+    if(!fork())
     {
         initF();
         char buff[150];
