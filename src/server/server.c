@@ -8,10 +8,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CACHESIZE 50
+#define BUFFSIZE 4096
+
 typedef struct stock {
     int codigo;
     ssize_t stock;
 } Stock;
+
+typedef struct cache {
+    int codigo;
+    double preco;
+    size_t used;
+}Cache;
 
 void initF() {
     struct stat a;
@@ -60,15 +69,17 @@ void initF() {
     }
 }
 
-char* articleInfo(int id, int* size) {
+char* articleInfo(int rd, int wr, int id, int* size) {
     int stock = open("stocks", O_RDONLY);
     struct stat info;
     fstat(stock, &info);
     if(((id * sizeof(Stock)) + sizeof(time_t)) >= info.st_size) return NULL;
-    char* buff = malloc(100);
+    char* buff = malloc(BUFFSIZE);
     Stock s;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     int artigos = open("artigos", O_RDONLY);
+    double preco;
+    char miniBuff[BUFFSIZE];
     *size = sprintf(buff, "%zu %.2f\n", s.stock, getArticlePrice(artigos, id));
     close(artigos);
     close(stock);
@@ -86,7 +97,7 @@ ssize_t updateStock(int id, ssize_t new_stock) {
     s.stock += new_stock;
     pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     if(new_stock < 0) {
-        char buff[200];
+        char buff[BUFFSIZE];
         int artigos = open("artigos", O_RDONLY);
         double price = getArticlePrice(artigos, id);
         close(artigos);
@@ -100,13 +111,15 @@ ssize_t updateStock(int id, ssize_t new_stock) {
 
 int main() {
     int idk[2];
+    int prices[2];
     pipe(idk);
+    pipe(prices);
     if(!fork()) {
         for(;;) {
             int article = open("/tmp/article.pipe", O_RDONLY);
             int read;
-            char buff[100];
-            while((read = readln(article, buff, 100))) {
+            char buff[BUFFSIZE];
+            while((read = readln(article, buff, BUFFSIZE))) {
                 int stocks = open("stocks", O_WRONLY | O_APPEND);
                 Stock s = {0, 0};
                 switch(buff[0]) {
@@ -122,17 +135,50 @@ int main() {
     }
     if(!fork())
     {
+        Cache cache[CACHESIZE] = {0};
+        char buff[BUFFSIZE];
+        size_t times = 0;
+        while(read(idk[1], buff, BUFFSIZE)) {
+            if(buff[0] <= '9' && buff[0] >= '0') {
+                int id = atoi(buff);
+                int artigos = open("artigos", O_RDONLY);
+                if(times < CACHESIZE) {
+                    cache[times] = (Cache) {.codigo = id, 
+                        .preco = getArticlePrice(id, artigos), 
+                        .used = times};
+                    times++;
+                }
+                else {
+                    int i;
+                    for(i = 0; i < CACHESIZE && cache[i].codigo != id; i++);
+                    if(i == CACHESIZE) {
+                        cache[CACHESIZE-1] = (Cache) {.codigo = id, 
+                            .preco = getArticlePrice(id, artigos), 
+                            .used = times};
+                        times++;
+                        write(prices[0], &cache[CACHESIZE-1].preco, sizeof(double));
+                    }
+                    else {
+                        write(prices[0], &cache[i].preco, sizeof(double));
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+    if(!fork())
+    {
         initF();
-        char buff[150];
+        char buff[BUFFSIZE];
         int id, size;
         size = sprintf(buff, "%d\n", getpid());
         write(1, buff, size);
         mkfifo("/tmp/rd", 0700);
         for(;;) {
             int rd = open("/tmp/rd", O_RDONLY);
-            while(readln(rd, buff, 150)) {
+            while(readln(rd, buff, BUFFSIZE)) {
                 char* pid = strtok(buff, " ");
-                char path[100];
+                char path[BUFFSIZE];
                 sprintf(path, "/tmp/%s", pid);
                 int wr = open(path, O_WRONLY);
                 char* cid = strtok(NULL, " ");
