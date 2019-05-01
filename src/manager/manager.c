@@ -70,11 +70,11 @@ int main() {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
         switch(buff[0]) {
             case 'i':
-                write(pipe, buff, read);
                 str[0] = strtok(buff, " ");
                 for(i = 0; i < 2 && str[i]; i++)
                     str[i+1] = strtok(NULL, " ");
                 if(i != 2 || !str[2]) break;
+                write(pipe, buff, read);
                 char* name = str[1];
                 double price = atof(str[2]);
                 int id = addArticle(name, price);
@@ -82,14 +82,18 @@ int main() {
                 write(1, buff, strlen(buff) + 1);
                 break;
             case 'n':
-                strtok(buff, " ");
+                str[0] = strtok(buff, " ");
+                str[1] = strtok(NULL, " ");
+                if(!str[1]) break;
                 id = atoi(strtok(NULL, " "));
                 name = strtok(NULL, " ");
                 updateName(id, name);
                 break;
             case 'p':
+                str[0] = strtok(buff, " ");
+                str[1] = strtok(NULL, " ");
+                if(!str[1]) break;
                 write(pipe, buff, read);
-                strtok(buff, " ");
                 id = atoi(strtok(NULL, " "));
                 price = atof(strtok(NULL, " "));
                 updateArticle(id, price);
