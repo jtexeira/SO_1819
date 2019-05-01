@@ -63,15 +63,20 @@ static int updateArticle(int id, double new_price) {
 int main() {
     char buff[200];
     int read;
+    char* str[3];
+    int i;
     mkfifo("/tmp/article.pipe", 00700);
     while((read = readln(0, buff, 200))) {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
-        write(pipe, buff, read);
         switch(buff[0]) {
             case 'i':
-                strtok(buff, " ");
-                char* name = strtok(NULL, " ");
-                double price = atof(strtok(NULL, " "));
+                write(pipe, buff, read);
+                str[0] = strtok(buff, " ");
+                for(i = 0; i < 2 && str[i]; i++)
+                    str[i+1] = strtok(NULL, " ");
+                if(i != 2 || !str[2]) break;
+                char* name = str[1];
+                double price = atof(str[2]);
                 int id = addArticle(name, price);
                 sprintf(buff, "%d\n", id);
                 write(1, buff, strlen(buff) + 1);
@@ -83,6 +88,7 @@ int main() {
                 updateName(id, name);
                 break;
             case 'p':
+                write(pipe, buff, read);
                 strtok(buff, " ");
                 id = atoi(strtok(NULL, " "));
                 price = atof(strtok(NULL, " "));
