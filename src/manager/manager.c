@@ -28,7 +28,7 @@ static int addArticle(char* name, double price) {
         close(artigos);
         id = 0;
     }
-        return id;
+    return id;
 }
 
 static int updateName(int id, char* new_name) {
@@ -62,8 +62,11 @@ static int updateArticle(int id, double new_price) {
 
 int main() {
     char buff[200];
-    char* tmp;
-    while(readln(0, buff, 200))
+    int read;
+    mkfifo("/tmp/article.pipe", 00700);
+    while((read = readln(0, buff, 200))) {
+        int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
+        write(pipe, buff, read);
         switch(buff[0]) {
             case 'i':
                 strtok(buff, " ");
@@ -80,15 +83,13 @@ int main() {
                 updateName(id, name);
                 break;
             case 'p':
-                mkfifo("/tmp/article.pipe", 00700);
-                int pipe = open("/tmp/article.pipe", 00700);
-                tmp = strtok(buff, " ");
-                write(pipe, tmp, sizeof(tmp));
-                close(pipe);
+                strtok(buff, " ");
                 id = atoi(strtok(NULL, " "));
                 price = atof(strtok(NULL, " "));
                 updateArticle(id, price);
                 break;
         }
+        close(pipe);
+    }
     return 0;
 }

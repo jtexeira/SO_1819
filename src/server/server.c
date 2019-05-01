@@ -101,16 +101,25 @@ ssize_t updateStock(int id, ssize_t new_stock) {
 int main() {
     int idk[2];
     pipe(idk);
-    /*
     if(!fork()) {
         for(;;) {
             int article = open("/tmp/article.pipe", O_RDONLY);
             int read;
             char buff[100];
-            while((read = readln(article, buff, 100)));
+            while((read = readln(article, buff, 100))) {
+                int stocks = open("stocks", O_WRONLY | O_APPEND);
+                Stock s = {0, 0};
+                switch(buff[0]) {
+                    case 'i':
+                        write(stocks, &s, sizeof(Stock));
+                        break;
+                    case 'p':
+                        break;
+                }
+            }
         }
+        return 0;
     }
-    */
     if(!fork())
     {
         initF();
