@@ -135,6 +135,7 @@ int main() {
                         write(stocks, &s, sizeof(Stock));
                         break;
                     case 'p':
+                        write(idk[1], buff, read);
                         break;
                 }
             }

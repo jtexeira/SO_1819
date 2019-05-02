@@ -84,18 +84,19 @@ int main() {
             case 'n':
                 str[0] = strtok(buff, " ");
                 str[1] = strtok(NULL, " ");
-                if(!str[1]) break;
-                id = atoi(strtok(NULL, " "));
-                name = strtok(NULL, " ");
-                updateName(id, name);
+                str[2] = strtok(NULL, " ");
+                if(!str[1] || !str[2]) break;
+                id = atoi(str[1]);
+                updateName(id, str[2]);
                 break;
             case 'p':
                 str[0] = strtok(buff, " ");
                 str[1] = strtok(NULL, " ");
-                if(!str[1]) break;
+                str[2] = strtok(NULL, " ");
+                if(!str[1] || !str[2]) break;
                 write(pipe, buff, read);
-                id = atoi(strtok(NULL, " "));
-                price = atof(strtok(NULL, " "));
+                id = atoi(str[1]);
+                price = atof(str[2]);
                 updateArticle(id, price);
                 break;
         }
