@@ -152,47 +152,48 @@ int main() {
         Cache cache[CACHESIZE] = {0};
         char buff[BUFFSIZE];
         size_t times = 0;
-        while(readln(idk[0], buff, BUFFSIZE)) {
-            if(buff[0] <= '9' && buff[0] >= '0') {
-                int id = atoi(buff);
-                int i;
-                for(i = 0; i < CACHESIZE && i < times && cache[i].codigo != id; i++);
-                if(i == times && times < CACHESIZE) {
-                    cache[times] = (Cache) {.codigo = id, 
-                        .preco = getArticlePrice(id), 
-                        .used = times};
-                    printf("%f\n", getArticlePrice(id));
-                    write(prices[1], &(cache[times].preco), sizeof(double));
-                    times++;
-                }
-                else {
-                    if(i == CACHESIZE) {
-                        cache[CACHESIZE-1] = (Cache) {.codigo = id, 
+        for(;;)
+            while(readln(idk[0], buff, BUFFSIZE)) {
+                if(buff[0] <= '9' && buff[0] >= '0') {
+                    int id = atoi(buff);
+                    int i;
+                    for(i = 0; i < CACHESIZE && i < times && cache[i].codigo != id; i++);
+                    if(i == times && times < CACHESIZE) {
+                        cache[times] = (Cache) {.codigo = id, 
                             .preco = getArticlePrice(id), 
                             .used = times};
+                        printf("%f\n", getArticlePrice(id));
+                        write(prices[1], &(cache[times].preco), sizeof(double));
                         times++;
-                        write(prices[1], &(cache[CACHESIZE-1].preco), sizeof(double));
                     }
                     else {
-                        write(prices[1], &(cache[i].preco), sizeof(double));
-                        cache[i].used = times++;
+                        if(i == CACHESIZE) {
+                            cache[CACHESIZE-1] = (Cache) {.codigo = id, 
+                                .preco = getArticlePrice(id), 
+                                .used = times};
+                            times++;
+                            write(prices[1], &(cache[CACHESIZE-1].preco), sizeof(double));
+                        }
+                        else {
+                            write(prices[1], &(cache[i].preco), sizeof(double));
+                            cache[i].used = times++;
+                        }
+                        qsort(cache, CACHESIZE, sizeof(Cache), cacheComp);
                     }
-                    qsort(cache, CACHESIZE, sizeof(Cache), cacheComp);
+                }
+                else if(buff[0] == 'p') {
+                    char* str[3];
+                    str[0] = strtok(buff, " ");
+                    str[1] = strtok(NULL, " ");
+                    str[2] = strtok(NULL, " ");
+                    int id = atoi(str[1]);
+                    int i;
+                    double price = atof(str[2]);
+                    for(i = 0; i < CACHESIZE && i < times && cache[i].codigo != id; i++);
+                    if(cache[i].codigo == id)
+                        cache[i].preco = price;
                 }
             }
-            else if(buff[0] == 'p') {
-                char* str[3];
-                str[0] = strtok(buff, " ");
-                str[1] = strtok(NULL, " ");
-                str[2] = strtok(NULL, " ");
-                int id = atoi(str[1]);
-                int i;
-                double price = atof(str[2]);
-                for(i = 0; i < CACHESIZE && i < times && cache[i].codigo != id; i++);
-                if(cache[i].codigo == id)
-                    cache[i].preco = price;
-            }
-        }
         return 0;
     }
     if(!fork())
