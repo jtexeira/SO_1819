@@ -14,11 +14,13 @@ char* getArticleName(int strings, int artigos, int id) {
     return buff;
 }
 
-double getArticlePrice(int artigos, int id) {
+double getArticlePrice(int id) {
     Artigo a;
+    int artigos = open("artigos", O_RDONLY);
     struct stat b;
     fstat(artigos, &b);
     if(SPOT(id) >= b.st_size) return -1;
     pread(artigos, &a, sizeof(Artigo), SPOT(id));
+    close(artigos);
     return a.price;
 }

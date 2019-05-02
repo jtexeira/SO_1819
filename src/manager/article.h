@@ -13,6 +13,6 @@ typedef struct artigo {
 
 char* getArticleName(int, int, int);
 
-double getArticlePrice(int, int);
+double getArticlePrice(int);
 
 #endif

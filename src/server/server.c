@@ -77,16 +77,17 @@ char* articleInfo(int rd, int wr, int id, int* size) {
     char* buff = malloc(BUFFSIZE);
     Stock s;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
-    int artigos = open("artigos", O_RDONLY);
     double preco;
     char miniBuff[BUFFSIZE];
-    *size = sprintf(buff, "%zu %.2f\n", s.stock, getArticlePrice(artigos, id));
-    close(artigos);
+    *size = sprintf(miniBuff, "%d\n", id);
+    write(wr, miniBuff, *size);
+    read(rd, &preco, sizeof(double));
+    *size = sprintf(buff, "%zu %.2f\n", s.stock, preco);
     close(stock);
     return buff;
 } 
 
-ssize_t updateStock(int id, ssize_t new_stock) {
+ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     int stock = open("stocks", O_RDWR);
     int vendas = open("vendas", O_WRONLY | O_APPEND | O_CREAT, 0700);
     Stock s;
@@ -98,15 +99,22 @@ ssize_t updateStock(int id, ssize_t new_stock) {
     pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     if(new_stock < 0) {
         char buff[BUFFSIZE];
-        int artigos = open("artigos", O_RDONLY);
-        double price = getArticlePrice(artigos, id);
-        close(artigos);
-        int read = sprintf(buff, "%d %zu %.2f\n", id, -new_stock, -new_stock * price);
-        write(vendas, buff, read);
+        double preco;
+        char miniBuff[BUFFSIZE];
+        int size;
+        size = sprintf(miniBuff, "%d\n", id);
+        write(wr, miniBuff, size);
+        read(rd, &preco, sizeof(double));
+        size = sprintf(buff, "%d %zu %.2f\n", id, -new_stock, -new_stock * preco);
+        write(vendas, buff, size);
     }
     close(stock);
     close(vendas);
     return s.stock;
+}
+
+int cacheComp(const void* a, const void* b) {
+    return ((Cache*) b)->used - ((Cache*) a)->used;
 }
 
 int main() {
@@ -138,29 +146,32 @@ int main() {
         Cache cache[CACHESIZE] = {0};
         char buff[BUFFSIZE];
         size_t times = 0;
-        while(read(idk[1], buff, BUFFSIZE)) {
+        while(readln(idk[0], buff, BUFFSIZE)) {
             if(buff[0] <= '9' && buff[0] >= '0') {
                 int id = atoi(buff);
-                int artigos = open("artigos", O_RDONLY);
-                if(times < CACHESIZE) {
+                int i;
+                for(i = 0; i < CACHESIZE && i < times && cache[i].codigo != id; i++);
+                if(i == times && times < CACHESIZE) {
                     cache[times] = (Cache) {.codigo = id, 
-                        .preco = getArticlePrice(id, artigos), 
+                        .preco = getArticlePrice(id), 
                         .used = times};
+                    printf("%f\n", getArticlePrice(id));
+                    write(prices[1], &(cache[times].preco), sizeof(double));
                     times++;
                 }
                 else {
-                    int i;
-                    for(i = 0; i < CACHESIZE && cache[i].codigo != id; i++);
                     if(i == CACHESIZE) {
                         cache[CACHESIZE-1] = (Cache) {.codigo = id, 
-                            .preco = getArticlePrice(id, artigos), 
+                            .preco = getArticlePrice(id), 
                             .used = times};
                         times++;
-                        write(prices[0], &cache[CACHESIZE-1].preco, sizeof(double));
+                        write(prices[1], &(cache[CACHESIZE-1].preco), sizeof(double));
                     }
                     else {
-                        write(prices[0], &cache[i].preco, sizeof(double));
+                        write(prices[1], &(cache[i].preco), sizeof(double));
+                        cache[i].used = times++;
                     }
+                    qsort(cache, CACHESIZE, sizeof(Cache), cacheComp);
                 }
             }
         }
@@ -190,7 +201,7 @@ int main() {
                 id = atoi(cid);
                 char* abc = strtok(NULL, " ");
                 if(!abc) {
-                    char* info = articleInfo(id, &size);
+                    char* info = articleInfo(prices[0], idk[1], id, &size);
                     if(!info)
                         write(wr, "\b\n", 2); 
                     else 
@@ -198,7 +209,7 @@ int main() {
                 }
                 else {
                     ssize_t quant = atoi(abc);
-                    int stock = updateStock(id, quant);
+                    int stock = updateStock(prices[0], idk[1], id, quant);
                     size = sprintf(buff, "%d\n", stock);
                     write(wr, buff, size); 
                 }
