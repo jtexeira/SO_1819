@@ -80,7 +80,10 @@ char* articleInfo(int rd, int wr, int id, int* size) {
     double preco;
     char miniBuff[BUFFSIZE];
     *size = sprintf(miniBuff, "%d\n", id);
-    write(wr, miniBuff, *size);
+    if(write(wr, miniBuff, *size) == EAGAIN) 
+        preco = getArticlePrice(id);
+    else
+        read(rd, &preco, sizeof(double));
     read(rd, &preco, sizeof(double));
     *size = sprintf(buff, "%zu %.2f\n", s.stock, preco);
     close(stock);
@@ -103,8 +106,10 @@ ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
         char miniBuff[BUFFSIZE];
         int size;
         size = sprintf(miniBuff, "%d\n", id);
-        write(wr, miniBuff, size);
-        read(rd, &preco, sizeof(double));
+        if(write(wr, miniBuff, size) == EAGAIN) 
+            preco = getArticlePrice(id);
+        else
+            read(rd, &preco, sizeof(double));
         size = sprintf(buff, "%d %zu %.2f\n", id, -new_stock, -new_stock * preco);
         write(vendas, buff, size);
     }
@@ -174,6 +179,18 @@ int main() {
                     }
                     qsort(cache, CACHESIZE, sizeof(Cache), cacheComp);
                 }
+            }
+            else if(buff[0] == 'p') {
+                char* str[3];
+                str[0] = strtok(buff, " ");
+                str[1] = strtok(NULL, " ");
+                str[2] = strtok(NULL, " ");
+                int id = atoi(str[1]);
+                int i;
+                double price = atof(str[2]);
+                for(i = 0; i < CACHESIZE && i < times && cache[i].codigo != id; i++);
+                if(cache[i].codigo == id)
+                    cache[i].preco = price;
             }
         }
         return 0;

@@ -62,6 +62,7 @@ static int updateArticle(int id, double new_price) {
 
 int main() {
     char buff[200];
+    char cpy[200];
     int read;
     char* str[3];
     int i;
@@ -90,14 +91,15 @@ int main() {
                 updateName(id, str[2]);
                 break;
             case 'p':
+                strcpy(cpy, buff);
                 str[0] = strtok(buff, " ");
                 str[1] = strtok(NULL, " ");
                 str[2] = strtok(NULL, " ");
                 if(!str[1] || !str[2]) break;
-                write(pipe, buff, read);
                 id = atoi(str[1]);
                 price = atof(str[2]);
                 updateArticle(id, price);
+                write(pipe, cpy, read);
                 break;
         }
         close(pipe);
