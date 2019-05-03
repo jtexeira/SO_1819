@@ -10,7 +10,6 @@
 #include <time.h>
 
 #define CACHESIZE 50
-#define BUFFSIZE 4096
 
 typedef struct stock {
     int codigo;
@@ -65,6 +64,7 @@ void initF() {
                 new.stock = 0;
                 write(stock, &new, sizeof(Stock));
             }
+            close(stock);
         }
         close(artigos);
     }
@@ -92,7 +92,7 @@ char* articleInfo(int rd, int wr, int id, int* size) {
 
 ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     int stock = open("stocks", O_RDWR);
-    int vendas = open("vendas", O_WRONLY | O_APPEND | O_CREAT, 0600);
+    int vendas = open("vendas", O_WRONLY | O_APPEND | O_CREAT, 00600);
     Stock s;
     struct stat info;
     fstat(stock, &info);
@@ -110,6 +110,7 @@ ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
             preco = getArticlePrice(id);
         else
             read(rd, &preco, sizeof(double));
+        memset(buff, 0, sizeof(buff));
         size = sprintf(buff, "%d %zu %.2f\n", id, -new_stock, -new_stock * preco);
         write(vendas, buff, size);
     }
@@ -150,18 +151,21 @@ int main() {
             int article = open("/tmp/article.pipe", O_RDONLY);
             int read;
             char buff[BUFFSIZE];
+            int newFile = 0;
             while((read = readln(article, buff, BUFFSIZE))) {
-                int stocks = open("stocks", O_WRONLY | O_APPEND);
                 Stock s = {0, 0};
                 switch(buff[0]) {
                     case 'i':
-                        write(stocks, &s, sizeof(Stock));
+                        newFile = 1;
                         break;
                     case 'p':
                         write(idk[1], buff, read);
                         break;
                 }
             }
+            if(newFile) 
+                initF();
+            close(article);
         }
         return 0;
     }

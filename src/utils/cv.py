@@ -22,6 +22,6 @@ def main():
         print(v[c]())
 
 def rQuant(priceMax=10000):
-    return randint(1, priceMax)
+    return randint(-priceMax, priceMax)
 
 main()

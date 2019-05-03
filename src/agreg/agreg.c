@@ -15,8 +15,8 @@ int main() {
     Venda* vendas = malloc(sizeof(Venda) * 50);
     memset(vendas, 0, sizeof(Venda) * 50);
     int size = 50;
-    char buff[100]; 
-    while(readln(0, buff, 100)) {
+    char buff[BUFFSIZE]; 
+    while(readln(0, buff, BUFFSIZE)) {
         char* tmp[3];
         int z = 0;
         tmp[z++] = strtok(buff, " ");
@@ -25,9 +25,13 @@ int main() {
             break;
         int id = atoi(tmp[0]);
         if(id >= size) {
-            vendas = realloc(vendas, id * 2);
-            memset(vendas + size, 0, ((id*2) - size) * sizeof(Venda));
-            size = id * 2;
+            int newSize = id * 2;
+            Venda* newVendas = malloc(sizeof(Venda) * newSize);
+            memset(newVendas, 0, newSize * sizeof(Venda));
+            memcpy(newVendas, vendas, size * sizeof(Venda));
+            free(vendas);
+            vendas = newVendas;
+            size = newSize;
         }
         int quant = atoi(tmp[1]);
         double preco = atof(tmp[2]);

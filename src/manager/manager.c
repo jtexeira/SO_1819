@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "article.h"
 #include "../utils/utils.h"
+#include <errno.h>
 
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
@@ -45,6 +46,8 @@ static int updateName(int id, char* new_name) {
     strtok(new_name, "\n");
     pwrite(artigos, &a, sizeof(Artigo), SPOT(id));
     write(strings, new_name, strlen(new_name) + 1);
+    close(artigos);
+    close(strings);
     return 0;
 }
 
@@ -57,6 +60,7 @@ static int updateArticle(int id, double new_price) {
     pread(artigos, &a, sizeof(Artigo), SPOT(id));
     a.price = new_price;
     pwrite(artigos, &a, sizeof(Artigo), SPOT(id));
+    close(artigos);
     return 0;
 }
 
@@ -75,7 +79,7 @@ int main() {
                 for(i = 0; i < 2 && str[i]; i++)
                     str[i+1] = strtok(NULL, " ");
                 if(i != 2 || !str[2]) break;
-                write(pipe, buff, read);
+                while(write(pipe, buff, read) == EAGAIN);
                 char* name = str[1];
                 double price = atof(str[2]);
                 int id = addArticle(name, price);
@@ -99,7 +103,7 @@ int main() {
                 id = atoi(str[1]);
                 price = atof(str[2]);
                 updateArticle(id, price);
-                write(pipe, cpy, read);
+                while(write(pipe, cpy, read) == EAGAIN);
                 break;
         }
         close(pipe);

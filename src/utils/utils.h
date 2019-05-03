@@ -3,6 +3,8 @@
 
 #include <unistd.h>
 
+#define BUFFSIZE 4096
+
 ssize_t readln(int fildes, void *buff, size_t nbyte); 
 
 #endif
