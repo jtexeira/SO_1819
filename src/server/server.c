@@ -33,7 +33,7 @@ void initF() {
     time_t articleCreate;
     read(artigos, &articleCreate, sizeof(time_t));
     if(stat("stocks", &a)) {
-        int stock = open("stocks", O_CREAT | O_WRONLY | O_APPEND, 0700);
+        int stock = open("stocks", O_CREAT | O_WRONLY | O_APPEND, 0600);
         write(stock, &articleCreate, sizeof(time_t));
         for(i = 0; i < nArtigos; i++) {
             new.codigo = i;
@@ -92,7 +92,7 @@ char* articleInfo(int rd, int wr, int id, int* size) {
 
 ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     int stock = open("stocks", O_RDWR);
-    int vendas = open("vendas", O_WRONLY | O_APPEND | O_CREAT, 0700);
+    int vendas = open("vendas", O_WRONLY | O_APPEND | O_CREAT, 0600);
     Stock s;
     struct stat info;
     fstat(stock, &info);
@@ -220,7 +220,7 @@ int main() {
         int id, size;
         size = sprintf(buff, "%d\n", getpid());
         write(1, buff, size);
-        mkfifo("/tmp/rd", 0700);
+        mkfifo("/tmp/rd", 0600);
         for(;;) {
             int rd = open("/tmp/rd", O_RDONLY);
             while(readln(rd, buff, BUFFSIZE)) {

@@ -8,7 +8,7 @@
 
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
-    strings = open("strings", O_WRONLY | O_APPEND | O_CREAT, 00700);
+    strings = open("strings", O_WRONLY | O_APPEND | O_CREAT, 00600);
     struct stat a;
     fstat(strings, &a);
     write(strings, name, strlen(name) + 1);
@@ -21,7 +21,7 @@ static int addArticle(char* name, double price) {
         close(artigos);
     }
     else {
-        artigos = open("artigos", O_WRONLY | O_APPEND | O_CREAT, 00700);
+        artigos = open("artigos", O_WRONLY | O_APPEND | O_CREAT, 00600);
         fstat(artigos, &a);
         write(artigos, &(a.st_mtim.tv_sec), sizeof(time_t));
         write(artigos, &b, sizeof(Artigo));
@@ -66,7 +66,7 @@ int main() {
     int read;
     char* str[3];
     int i;
-    mkfifo("/tmp/article.pipe", 00700);
+    mkfifo("/tmp/article.pipe", 00600);
     while((read = readln(0, buff, 200))) {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
         switch(buff[0]) {
