@@ -1,5 +1,5 @@
 ############################# Makefile ##########################
-CFLAGS= -g -W -Wall -Wextra -O2 -D_GNU_SOURCE
+CFLAGS= -W -Wall -Wextra -O2 -D_GNU_SOURCE
 UTILS=../utils
 DOC = ../docs
 OBJECTS:= agreg.o $(UTILS)/utils.o
