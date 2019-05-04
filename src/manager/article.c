@@ -3,10 +3,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-char* getArticleName(int strings, int artigos, int id) {
+char* getArticleName(int id) {
     char* buff = malloc(100);
     Artigo a;
     struct stat b;
+    int artigos = open("artigos", O_RDONLY);
+    int strings = open("strings", O_RDONLY);
     fstat(artigos, &b);
     if(id * sizeof(Artigo) >= b.st_size) return NULL;
     pread(artigos, &a, sizeof(Artigo), SPOT(id));

@@ -64,12 +64,35 @@ static int updateArticle(int id, double new_price) {
     return 0;
 }
 
+static void strCleaner() {
+    int artigos = open("artigos", O_RDWR);
+    struct stat b;
+    fstat(artigos, &b);
+    int id = (b.st_size - sizeof(time_t)) / sizeof(Artigo);
+    Artigo all[id];
+    pread(artigos, all, sizeof(Artigo) * id, SPOT(0)); 
+    int strings = open("strings", O_RDONLY);
+    fstat(strings, &b);
+    char string[b.st_size];
+    read(strings, string, b.st_size);
+    close(strings);
+    strings = open("strings", O_WRONLY | O_APPEND | O_TRUNC);
+    for(int i = 0; i < id; i++) {
+        fstat(strings, &b);
+        write(strings, &string[all[i].name], strlen(&string[all[i].name]) + 1);
+        all[id].name = b.st_size;
+    }
+    pwrite(artigos, all, sizeof(all), sizeof(time_t));
+}
+
 int main() {
     char buff[200];
     char cpy[200];
     int read;
     char* str[3];
     int i;
+    int strings, articles; 
+    strings = articles = 0;
     mkfifo("/tmp/article.pipe", 00600);
     while((read = readln(0, buff, 200))) {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
@@ -85,6 +108,8 @@ int main() {
                 int id = addArticle(name, price);
                 sprintf(buff, "%d\n", id);
                 write(1, buff, strlen(buff) + 1);
+                articles++;
+                strings++;
                 break;
             case 'n':
                 str[0] = strtok(buff, " ");
@@ -95,7 +120,7 @@ int main() {
                 updateName(id, str[2]);
                 break;
             case 'p':
-                strcpy(cpy, buff);
+                strncpy(cpy, buff, BUFFSIZE);
                 str[0] = strtok(buff, " ");
                 str[1] = strtok(NULL, " ");
                 str[2] = strtok(NULL, " ");
@@ -104,6 +129,11 @@ int main() {
                 price = atof(str[2]);
                 updateArticle(id, price);
                 while(write(pipe, cpy, read) == EAGAIN);
+                strings++;
+                if(articles/strings < 0.8) {
+                    strCleaner();
+                    strings = articles;
+                }
                 break;
         }
         close(pipe);
