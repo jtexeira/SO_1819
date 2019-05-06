@@ -141,11 +141,7 @@ int runAg() {
     return 0;
 }
 
-int main() {
-    int idk[2];
-    int prices[2];
-    pipe(idk);
-    pipe(prices);
+void articleSync(int wr) {
     if(!fork()) {
         for(;;) {
             int article = open("/tmp/article.pipe", O_RDONLY);
@@ -153,13 +149,12 @@ int main() {
             char buff[BUFFSIZE];
             int newFile = 0;
             while((read = readln(article, buff, BUFFSIZE))) {
-                Stock s = {0, 0};
                 switch(buff[0]) {
                     case 'i':
                         newFile = 1;
                         break;
                     case 'p':
-                        write(idk[1], buff, read);
+                        write(wr, buff, read);
                         break;
                 }
             }
@@ -167,15 +162,18 @@ int main() {
                 initF();
             close(article);
         }
-        return 0;
+        return;
     }
+}
+
+void articleCache(int rd, int wr) {
     if(!fork())
     {
         Cache cache[CACHESIZE] = {0};
         char buff[BUFFSIZE];
         size_t times = 0;
         for(;;)
-            while(readln(idk[0], buff, BUFFSIZE)) {
+            while(readln(rd, buff, BUFFSIZE)) {
                 if(buff[0] <= '9' && buff[0] >= '0') {
                     int id = atoi(buff);
                     int i;
@@ -184,7 +182,7 @@ int main() {
                         cache[times] = (Cache) {.codigo = id, 
                             .preco = getArticlePrice(id), 
                             .used = times};
-                        write(prices[1], &(cache[times].preco), sizeof(double));
+                        write(wr, &(cache[times].preco), sizeof(double));
                         times++;
                     }
                     else {
@@ -193,10 +191,10 @@ int main() {
                                 .preco = getArticlePrice(id), 
                                 .used = times};
                             times++;
-                            write(prices[1], &(cache[CACHESIZE-1].preco), sizeof(double));
+                            write(wr, &(cache[CACHESIZE-1].preco), sizeof(double));
                         }
                         else {
-                            write(prices[1], &(cache[i].preco), sizeof(double));
+                            write(wr, &(cache[i].preco), sizeof(double));
                             cache[i].used = times++;
                         }
                         qsort(cache, CACHESIZE, sizeof(Cache), cacheComp);
@@ -215,15 +213,16 @@ int main() {
                         cache[i].preco = price;
                 }
             }
-        return 0;
+        return;
     }
+}
+
+void server(int idk[2], int prices[2]) {
     if(!fork())
     {
         initF();
         char buff[BUFFSIZE];
         int id, size;
-        size = sprintf(buff, "%d\n", getpid());
-        write(1, buff, size);
         mkfifo("/tmp/rd", 0600);
         for(;;) {
             int rd = open("/tmp/rd", O_RDONLY);
@@ -258,7 +257,17 @@ int main() {
             close(rd);
         }
         unlink("/tmp/rd");
-        return 0;
+        return;
     }
+}
+
+int main() {
+    int idk[2];
+    int prices[2];
+    pipe(idk);
+    pipe(prices);
+    articleSync(idk[1]); 
+    articleCache(idk[0], prices[1]);
+    server(idk, prices);
     return 0;
 }
