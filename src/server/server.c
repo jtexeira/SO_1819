@@ -20,7 +20,7 @@ typedef struct cache {
     int codigo;
     double preco;
     size_t used;
-}Cache;
+} Cache;
 
 void initF() {
     struct stat a;
@@ -131,7 +131,13 @@ int runAg() {
         time_t timeAg = time(NULL);
         struct tm tm = *localtime(&timeAg);
         char buff[BUFFSIZE];
-        sprintf(buff, "%d-%d-%dT%d:%d:%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+        sprintf(buff, "%d-%d-%dT%d:%d:%d",
+                tm.tm_year + 1900, 
+                tm.tm_mon + 1, 
+                tm.tm_mday, 
+                tm.tm_hour, 
+                tm.tm_min, 
+                tm.tm_sec);
         int agFile = open(buff, O_WRONLY | O_CREAT, 00600);
         dup2(agFile, 1);
         close(agFile);
