@@ -7,6 +7,7 @@
 #include "../utils/utils.h"
 #include <stdlib.h>
 #include <string.h>
+#include <sys/inotify.h>
 
 #define CACHESIZE 50
 
@@ -125,7 +126,16 @@ int cacheComp(const void* a, const void* b) {
 void articleSync(int wr) {
     if(!fork()) {
         for(;;) {
-            int article = open("/tmp/article.pipe", O_RDONLY);
+            int article;
+            article = open("/tmp/article.pipe", O_RDONLY);
+            /*
+            while((article = open("/tmp/article.pipe", O_RDONLY) == ENOENT)) {
+                    int watch = inotify_init();
+                    inotify_add_watch(watch, "/tmp/article.pipe", IN_CREATE);
+                    struct inotify_event res;
+                    read(watch, &res, sizeof(struct inotify_event));
+            }
+            */
             int read;
             char buff[BUFFSIZE];
             int newFile = 0;
@@ -234,6 +244,7 @@ void server(int idk[2], int prices[2]) {
                     write(wr, buff, size); 
                 }
                 close(wr);
+                memset(buff, 0, sizeof(buff));
             }
             close(rd);
         }

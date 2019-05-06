@@ -111,15 +111,15 @@ int runAg() {
 }
 
 int main() {
-    char buff[200];
-    char cpy[200];
+    char buff[BUFFSIZE];
+    char cpy[BUFFSIZE];
     int read;
     char* str[3];
     int i;
     int strings, articles; 
     strings = articles = 0;
     mkfifo("/tmp/article.pipe", 00600);
-    while((read = readln(0, buff, 200))) {
+    while((read = readln(0, buff, BUFFSIZE))) {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
         switch(buff[0]) {
             case 'i':
@@ -143,6 +143,11 @@ int main() {
                 if(!str[1] || !str[2]) break;
                 id = atoi(str[1]);
                 updateName(id, str[2]);
+                strings++;
+                if(articles/strings < 0.8) {
+                    strCleaner();
+                    strings = articles;
+                }
                 break;
             case 'p':
                 strncpy(cpy, buff, BUFFSIZE);
@@ -154,17 +159,12 @@ int main() {
                 price = atof(str[2]);
                 updateArticle(id, price);
                 while(write(pipe, cpy, read) == EAGAIN);
-                strings++;
-                if(articles/strings < 0.8) {
-                    strCleaner();
-                    strings = articles;
-                }
                 break;
             case 'a':
                 runAg();
                 break;
         }
-        close(pipe);
+        //close(pipe);
     }
     return 0;
 }

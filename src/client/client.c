@@ -18,7 +18,7 @@ int main() {
     while((read = readln(0, buff, 130))) {
         char buffR[150];
         memset(buffR, 0, sizeof(char) * 150);
-        read = sprintf(buffR, "%d.pipe %s", getpid(), buff);
+        read = sprintf(buffR, "%d.pipe %s\n", getpid(), strtok(buff, "\n"));
         memset(buff, 0, sizeof(char) * 130);
         while(write(wr, buffR, read) == EAGAIN);
         read = readln(rd, buff, 100);
