@@ -125,17 +125,10 @@ int cacheComp(const void* a, const void* b) {
 
 void articleSync(int wr) {
     if(!fork()) {
+        mkfifo("/tmp/article.pipe", 00600);
         for(;;) {
             int article;
             article = open("/tmp/article.pipe", O_RDONLY);
-            /*
-            while((article = open("/tmp/article.pipe", O_RDONLY) == ENOENT)) {
-                    int watch = inotify_init();
-                    inotify_add_watch(watch, "/tmp/article.pipe", IN_CREATE);
-                    struct inotify_event res;
-                    read(watch, &res, sizeof(struct inotify_event));
-            }
-            */
             int read;
             char buff[BUFFSIZE];
             int newFile = 0;

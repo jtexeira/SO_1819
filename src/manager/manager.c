@@ -118,7 +118,6 @@ int main() {
     int i;
     int strings, articles; 
     strings = articles = 0;
-    mkfifo("/tmp/article.pipe", 00600);
     while((read = readln(0, buff, BUFFSIZE))) {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
         switch(buff[0]) {
@@ -164,7 +163,8 @@ int main() {
                 runAg();
                 break;
         }
-        //close(pipe);
+        close(pipe);
     }
+    unlink("tmp/article.pipe");
     return 0;
 }
