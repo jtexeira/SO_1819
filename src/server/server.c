@@ -10,6 +10,7 @@
 #include <sys/inotify.h>
 
 #define CACHESIZE 50
+#define SIZEID(id) (__off_t)((id * sizeof(Stock)) + sizeof(time_t))
 
 typedef struct stock {
     int codigo;
@@ -74,7 +75,7 @@ char* articleInfo(int rd, int wr, int id, int* size) {
     int stock = open("stocks", O_RDONLY);
     struct stat info;
     fstat(stock, &info);
-    if(((id * sizeof(Stock)) + sizeof(time_t)) >= info.st_size) return NULL;
+    if(SIZEID(id) >= info.st_size) return NULL;
     char* buff = malloc(BUFFSIZE);
     Stock s;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
@@ -96,7 +97,7 @@ ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     Stock s;
     struct stat info;
     fstat(stock, &info);
-    if(((id * sizeof(Stock)) + sizeof(time_t)) >= info.st_size) return -1;
+    if(SIZEID(id) >= info.st_size) return -1;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     s.stock += new_stock;
     pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
@@ -160,7 +161,7 @@ void articleCache(int rd, int wr) {
             while(readln(rd, buff, BUFFSIZE)) {
                 if(buff[0] <= '9' && buff[0] >= '0') {
                     int id = atoi(buff);
-                    int i;
+                    size_t i;
                     for(i = 0; i < CACHESIZE && i < times && cache[i].codigo != id; i++);
                     if(i == times && times < CACHESIZE) {
                         cache[times] = (Cache) {.codigo = id, 
@@ -190,7 +191,7 @@ void articleCache(int rd, int wr) {
                     str[1] = strtok(NULL, " ");
                     str[2] = strtok(NULL, " ");
                     int id = atoi(str[1]);
-                    int i;
+                    size_t i;
                     double price = atof(str[2]);
                     for(i = 0; i < CACHESIZE && i < times && cache[i].codigo != id; i++);
                     if(cache[i].codigo == id)

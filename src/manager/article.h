@@ -11,8 +11,6 @@ typedef struct artigo {
     double price;
 } Artigo;
 
-char* getArticleName(int);
-
 double getArticlePrice(int);
 
 #endif
