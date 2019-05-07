@@ -89,8 +89,34 @@ static void strCleaner() {
 static int runAg() {
     if(!fork()) {
         int vendas = open("vendas", O_RDONLY);
-        dup2(vendas, 0);
+        struct stat a;
+        fstat(vendas, &a);
+        char vendasS[a.st_size];
+        read(vendas, vendasS, a.st_size);
         close(vendas);
+        int pipes[2];
+        pipe(pipes);
+        size_t newI = 1;
+        for(size_t i = 0; i < a.st_size;) {
+            while(vendasS[newI] != '\n' && ++newI < a.st_size);
+            int ree[2];
+            pipe(ree);
+            write(ree[1], vendasS + i, newI - i);
+            i += newI;
+            if(!fork()) {
+                close(ree[1]);
+                close(pipes[0]);
+                dup2(ree[0], 0);
+                close(ree[0]);
+                dup2(pipes[1], 1);
+                close(pipes[1]);
+                execl("./ag","./ag", NULL);
+                return 0;
+            }
+            close(ree[0]);
+            close(ree[1]);
+        }
+        close(pipes[1]); 
         time_t timeAg = time(NULL);
         struct tm tm = *localtime(&timeAg);
         char buff[BUFFSIZE];
@@ -102,6 +128,8 @@ static int runAg() {
                 tm.tm_min, 
                 tm.tm_sec);
         int agFile = open(buff, O_WRONLY | O_CREAT, 00600);
+        dup2(pipes[0], 0);
+        close(pipes[0]);
         dup2(agFile, 1);
         close(agFile);
         execl("./ag","./ag", NULL);
