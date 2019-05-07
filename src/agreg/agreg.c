@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <errno.h>
 #include "../utils/utils.h"
 
 typedef struct venda {
@@ -44,7 +45,7 @@ int main() {
     for(i = 0; i < size; i++) {
         if(vendas[i].used) {
             int writeS = sprintf(buff, "%d %d %.2f\n", vendas[i].id, vendas[i].quant, vendas[i].preco);
-            write(1, buff, writeS);
+            while(write(1, buff, writeS) == EAGAIN);
         }
     }
     free(vendas);

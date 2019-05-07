@@ -1,5 +1,6 @@
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -7,6 +8,9 @@
 #include "../utils/utils.h"
 #include <errno.h>
 #include <time.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <signal.h>
 
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
@@ -96,13 +100,16 @@ static int runAg() {
         close(vendas);
         int pipes[2];
         pipe(pipes);
-        size_t newI = 1;
-        for(size_t i = 0; i < a.st_size;) {
-            while(vendasS[newI] != '\n' && ++newI < a.st_size);
+        fcntl(pipes[1], F_SETPIPE_SZ, a.st_size);
+        fcntl(pipes[1], F_SETFL, O_NONBLOCK);
+        size_t newI = 3000;
+        for(ssize_t i = 0; i < a.st_size;){
+            while(vendasS[newI++] != '\n');
             int ree[2];
             pipe(ree);
             write(ree[1], vendasS + i, newI - i);
-            i += newI;
+            i = newI;
+            newI += 1000;
             if(!fork()) {
                 close(ree[1]);
                 close(pipes[0]);
@@ -116,7 +123,7 @@ static int runAg() {
             close(ree[0]);
             close(ree[1]);
         }
-        close(pipes[1]); 
+        close(pipes[1]);
         time_t timeAg = time(NULL);
         struct tm tm = *localtime(&timeAg);
         char buff[BUFFSIZE];
@@ -133,11 +140,10 @@ static int runAg() {
         dup2(agFile, 1);
         close(agFile);
         execl("./ag","./ag", NULL);
-        return 0;
     }
     return 0;
 }
-
+    
 int main() {
     char buff[BUFFSIZE];
     char cpy[BUFFSIZE];
