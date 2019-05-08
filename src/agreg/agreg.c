@@ -8,7 +8,7 @@
 typedef struct venda {
     int id;
     int used;
-    int quant;
+    size_t quant;
     double preco;
 } Venda;
 
@@ -44,7 +44,7 @@ int main() {
     int i;
     for(i = 0; i < size; i++) {
         if(vendas[i].used) {
-            int writeS = sprintf(buff, "%d %d %.2f\n", vendas[i].id, vendas[i].quant, vendas[i].preco);
+            int writeS = sprintf(buff, "%d %ld %.2f\n", vendas[i].id, vendas[i].quant, vendas[i].preco);
             while(write(1, buff, writeS) == EAGAIN);
         }
     }
