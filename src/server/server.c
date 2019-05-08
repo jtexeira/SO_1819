@@ -14,7 +14,7 @@
 
 typedef struct stock {
     int codigo;
-    ssize_t stock;
+    size_t stock;
 } Stock;
 
 typedef struct cache {
@@ -91,7 +91,7 @@ char* articleInfo(int rd, int wr, int id, int* size) {
     return buff;
 } 
 
-ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
+size_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     int stock = open("stocks", O_RDWR);
     int vendas = open("vendas", O_WRONLY | O_APPEND | O_CREAT, 00600);
     Stock s;
@@ -99,7 +99,7 @@ ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     fstat(stock, &info);
     if(SIZEID(id) >= info.st_size) return -1;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
-    if(-new_stock <= s.stock) {
+    if(llabs(new_stock) <= s.stock) {
         s.stock += new_stock;
         pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
         if(new_stock < 0) {
@@ -234,10 +234,14 @@ void server(int idk[2], int prices[2]) {
                         write(wr, info, size + 1);
                 }
                 else {
-                    ssize_t quant = atoi(abc);
-                    ssize_t stock = updateStock(prices[0], idk[1], id, quant);
-                    size = sprintf(buff, "%ld\n", stock);
-                    write(wr, buff, size); 
+                    if(abc[0] >= 0 && abc[0] <= 9)
+                        write(wr, "\b\n", 2);
+                    else { 
+                        ssize_t quant = atoll(abc);
+                        size_t stock = updateStock(prices[0], idk[1], id, quant);
+                        size = sprintf(buff, "%ld\n", stock);
+                        write(wr, buff, size); 
+                    }
                 }
                 close(wr);
                 memset(buff, 0, sizeof(buff));
