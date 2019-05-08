@@ -99,21 +99,23 @@ ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     fstat(stock, &info);
     if(SIZEID(id) >= info.st_size) return -1;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
-    s.stock += new_stock;
-    pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
-    if(new_stock < 0) {
-        char buff[BUFFSIZE];
-        double preco;
-        char miniBuff[BUFFSIZE];
-        int size;
-        size = sprintf(miniBuff, "%d\n", id);
-        if(write(wr, miniBuff, size) == EAGAIN) 
-            preco = getArticlePrice(id);
-        else
-            read(rd, &preco, sizeof(double));
-        memset(buff, 0, sizeof(buff));
-        size = sprintf(buff, "%d %zu %.2f\n", id, -new_stock, -new_stock * preco);
-        write(vendas, buff, size);
+    if(-new_stock <= s.stock) {
+        s.stock += new_stock;
+        pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
+        if(new_stock < 0) {
+            char buff[BUFFSIZE];
+            double preco;
+            char miniBuff[BUFFSIZE];
+            int size;
+            size = sprintf(miniBuff, "%d\n", id);
+            if(write(wr, miniBuff, size) == EAGAIN) 
+                preco = getArticlePrice(id);
+            else
+                read(rd, &preco, sizeof(double));
+            memset(buff, 0, sizeof(buff));
+            size = sprintf(buff, "%d %zu %.2f\n", id, -new_stock, -new_stock * preco);
+            write(vendas, buff, size);
+        }
     }
     close(stock);
     close(vendas);
@@ -233,8 +235,8 @@ void server(int idk[2], int prices[2]) {
                 }
                 else {
                     ssize_t quant = atoi(abc);
-                    int stock = updateStock(prices[0], idk[1], id, quant);
-                    size = sprintf(buff, "%d\n", stock);
+                    ssize_t stock = updateStock(prices[0], idk[1], id, quant);
+                    size = sprintf(buff, "%ld\n", stock);
                     write(wr, buff, size); 
                 }
                 close(wr);
