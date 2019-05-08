@@ -74,11 +74,11 @@ static void strCleaner() {
     struct stat b;
     fstat(artigos, &b);
     int id = (b.st_size - sizeof(time_t)) / sizeof(Artigo);
-    Artigo all[id];
+    Artigo* all = malloc(sizeof(Artigo) * id);
     pread(artigos, all, sizeof(Artigo) * id, SPOT(0)); 
     int strings = open("strings", O_RDONLY);
     fstat(strings, &b);
-    char string[b.st_size];
+    char* string = malloc(b.st_size);
     read(strings, string, b.st_size);
     close(strings);
     strings = open("strings", O_WRONLY | O_APPEND | O_TRUNC);
@@ -88,6 +88,8 @@ static void strCleaner() {
         all[id].name = b.st_size;
     }
     pwrite(artigos, all, sizeof(all), sizeof(time_t));
+    free(string);
+    free(all);
 }
 
 static int runAg() {
@@ -95,12 +97,11 @@ static int runAg() {
         int vendas = open("vendas", O_RDONLY);
         struct stat a;
         fstat(vendas, &a);
-        char vendasS[a.st_size];
+        char* vendasS = malloc(a.st_size);
         read(vendas, vendasS, a.st_size);
         close(vendas);
         int pipes[2];
         pipe(pipes);
-        fcntl(pipes[1], F_SETPIPE_SZ, a.st_size);
         fcntl(pipes[1], F_SETFL, O_NONBLOCK);
         size_t newI = 3000;
         for(ssize_t i = 0; i < a.st_size;){
@@ -123,6 +124,7 @@ static int runAg() {
             close(ree[0]);
             close(ree[1]);
         }
+        free(vendasS);
         close(pipes[1]);
         time_t timeAg = time(NULL);
         struct tm tm = *localtime(&timeAg);
