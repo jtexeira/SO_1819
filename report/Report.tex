@@ -4,7 +4,7 @@
 \usepackage{hyperref}
 \usepackage{a4wide}
 \hypersetup{pdftitle={Sistema de Gestão de Vendas},
-pdfauthor={José Ferreira},
+pdfauthor={José Ferreira, João Teixeira},
 colorlinks=true,
 urlcolor=blue,
 linkcolor=black}
@@ -20,9 +20,9 @@ linkcolor=black}
 
 \begin{document}
 
-\title{Sistema de Gestão de Vendas\\ 
+\title{Gestão de Stocks\\ 
 \large Grupo Nº 2}
-\author{José Ferreira (A83683)}
+\author{José Ferreira (A83683) \and João Teixeira(A85504)}
 \date{\today}
 
 \begin{center}
@@ -46,12 +46,14 @@ linkcolor=black}
 
 \chapter{Introdução}
 
-O objetivo deste projeto é construir um sistema de gestão de vendas modular,
+O objetivo deste projeto é construir um sistema de gestão de stocks,
 de forma a ser capaz de armazenar informações de vendas e relacionar produtos,
 clientes e vendas de forma eficiente, aplicando uma arquitetura \textit{Cliente,
-Servidor} e conhecimentos sobre o Sistema Operativo Linux. Como objetivo, 
-é também necessário garantir o encapsulamento dos dados armazenados de forma
-a que não sejam possíveis alterações indevidas por agentes externos.\\
+Servidor} e conhecimentos sobre o Sistema Operativo baseados em Unix. Como objetivo, 
+é necessário implementar um sistema que permita a utilização concorrente de 
+um servidor por vários clientes, assegurando a conservação de toda a informação
+introduzida no sistema, bem como a consistencia da mesma pelos vários ficheiros
+e cache.\\
 Ao longo deste relatório vamos descrever as nossas abordagens a estes problemas.
 
 \chapter{Problema}
@@ -185,8 +187,8 @@ Para tal várias funcionalidades foram implementadas:
 
 \chapter{Arquitetura do projeto}
 
-Este projeto segue uma Arquitetura do tipo \textit{MVC}, Modelo, Apresentação e
-Controlador.
+Este projeto tem como arquitetura três grandes módulos, sendo estes \textit{Cliente
+de Vendas, Servidor de Vendas e Manutenção de artigos}.
 
 \section{Modelo}
 
