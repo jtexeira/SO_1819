@@ -88,6 +88,8 @@ static void strCleaner() {
         all[id].name = b.st_size;
     }
     pwrite(artigos, all, sizeof(all), sizeof(time_t));
+    close(strings);
+    close(artigos);
     free(string);
     free(all);
 }
@@ -152,7 +154,7 @@ int main() {
     int read;
     char* str[3];
     int i;
-    int strings, articles; 
+    size_t strings, articles; 
     strings = articles = 0;
     while((read = readln(0, buff, BUFFSIZE))) {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
@@ -179,7 +181,7 @@ int main() {
                 id = atoi(str[1]);
                 updateName(id, str[2]);
                 strings++;
-                if(articles/strings < 0.8) {
+                if((double) articles/strings < 0.8) {
                     strCleaner();
                     strings = articles;
                 }
@@ -193,7 +195,7 @@ int main() {
                 id = atoi(str[1]);
                 price = atof(str[2]);
                 updateArticle(id, price);
-                while(write(pipe, cpy, read) == EAGAIN);
+                write(pipe, cpy, read);
                 break;
             case 'a':
                 runAg();
