@@ -68,14 +68,11 @@ static int updateArticle(int id, double new_price) {
     close(artigos);
     return 0;
 }
-
+/*
 static void strCleaner() {
-    int artigos = open("artigos", O_RDWR);
+    int artigos = open("artigos", O_RDONLY);
     struct stat b;
     fstat(artigos, &b);
-    int id = (b.st_size - sizeof(time_t)) / sizeof(Artigo);
-    Artigo* all = malloc(sizeof(Artigo) * id);
-    pread(artigos, all, sizeof(Artigo) * id, SPOT(0)); 
     int strings = open("strings", O_RDONLY);
     fstat(strings, &b);
     char* string = malloc(b.st_size);
@@ -83,15 +80,34 @@ static void strCleaner() {
     close(strings);
     strings = open("strings", O_WRONLY | O_APPEND | O_TRUNC);
     for(int i = 0; i < id; i++) {
-        fstat(strings, &b);
-        write(strings, &string[all[i].name], strlen(&string[all[i].name]) + 1);
-        all[id].name = b.st_size;
+        updateName(i, string + all[id].name);
     }
-    pwrite(artigos, all, sizeof(all), sizeof(time_t));
     close(strings);
     close(artigos);
     free(string);
     free(all);
+}
+*/
+
+static void strCleaner() {
+    int artigos = open("artigos", O_RDONLY);
+    int strings = open("strings", O_RDONLY);
+    rename("strings", "/tmp/ree");
+    char buff[BUFFSIZE];
+    int newStrings = open("strings", O_WRONLY | O_CREAT | O_APPEND, 00600);
+    struct stat b;
+    fstat(artigos, &b);
+    int id;
+    Artigo a;
+    for(id = 0; SPOT(id) < b.st_size; id++) {
+        pread(artigos, &a, sizeof(Artigo), SPOT(id));
+        pread(strings, buff, BUFFSIZE, a.name);
+        updateName(id, buff);
+    }
+
+    close(artigos);
+    close(newStrings);
+    close(strings);
 }
 
 static int runAg() {
@@ -155,7 +171,10 @@ int main() {
     char* str[3];
     int i;
     size_t strings, articles; 
+    struct stat a;
     strings = articles = 0;
+    if(stat("artigos", &a))
+        strings = articles = (a.st_size - sizeof(time_t)) / sizeof(Artigo); 
     while((read = readln(0, buff, BUFFSIZE))) {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
         switch(buff[0]) {
@@ -179,9 +198,9 @@ int main() {
                 str[2] = strtok(NULL, " ");
                 if(!str[1] || !str[2]) break;
                 id = atoi(str[1]);
-                updateName(id, str[2]);
+                int r = updateName(id, str[2]);
                 strings++;
-                if((double) articles/strings < 0.8) {
+                if(r != -1 && strings && ((double) articles/strings < 0.8)) {
                     strCleaner();
                     strings = articles;
                 }
@@ -195,7 +214,7 @@ int main() {
                 id = atoi(str[1]);
                 price = atof(str[2]);
                 updateArticle(id, price);
-                write(pipe, cpy, read);
+                //write(pipe, cpy, read);
                 break;
             case 'a':
                 runAg();
