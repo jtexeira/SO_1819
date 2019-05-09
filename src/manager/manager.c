@@ -68,26 +68,6 @@ static int updateArticle(int id, double new_price) {
     close(artigos);
     return 0;
 }
-/*
-static void strCleaner() {
-    int artigos = open("artigos", O_RDONLY);
-    struct stat b;
-    fstat(artigos, &b);
-    int strings = open("strings", O_RDONLY);
-    fstat(strings, &b);
-    char* string = malloc(b.st_size);
-    read(strings, string, b.st_size);
-    close(strings);
-    strings = open("strings", O_WRONLY | O_APPEND | O_TRUNC);
-    for(int i = 0; i < id; i++) {
-        updateName(i, string + all[id].name);
-    }
-    close(strings);
-    close(artigos);
-    free(string);
-    free(all);
-}
-*/
 
 static void strCleaner() {
     int artigos = open("artigos", O_RDONLY);
@@ -214,7 +194,7 @@ int main() {
                 id = atoi(str[1]);
                 price = atof(str[2]);
                 updateArticle(id, price);
-                //write(pipe, cpy, read);
+                while(write(pipe, cpy, read) == EAGAIN);
                 break;
             case 'a':
                 runAg();
