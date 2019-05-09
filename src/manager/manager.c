@@ -117,7 +117,8 @@ static int runAg() {
                 dup2(pipes[1], 1);
                 close(pipes[1]);
                 execl("./ag","./ag", NULL);
-                return 0;
+                perror("Small ag went wrong");
+                _exit(1);
             }
             close(ree[0]);
             close(ree[1]);
@@ -140,8 +141,11 @@ static int runAg() {
         dup2(agFile, 1);
         close(agFile);
         execl("./ag","./ag", NULL);
+        perror("Small ag went wrong");
+        _exit(1);
+
     }
-    return 0;
+    _exit(0);
 }
     
 int main() {
