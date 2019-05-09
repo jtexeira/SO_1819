@@ -14,7 +14,7 @@
 
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
-    strings = open("strings", O_WRONLY | O_APPEND | O_CREAT, 00600);
+    strings = open("strings", O_WRONLY | O_APPEND | O_CREAT, 00666);
     struct stat a;
     fstat(strings, &a);
     write(strings, name, strlen(name) + 1);
@@ -71,10 +71,10 @@ static int updateArticle(int id, double new_price) {
 
 static void strCleaner() {
     int artigos = open("artigos", O_RDONLY);
-    int strings = open("strings", O_RDONLY);
-    rename("strings", "/tmp/ree");
+    rename("strings", "ree");
+    int strings = open("ree", O_RDONLY);
     char buff[BUFFSIZE];
-    int newStrings = open("strings", O_WRONLY | O_CREAT | O_APPEND, 00600);
+    int newStrings = open("strings", O_WRONLY | O_CREAT | O_APPEND | O_TRUNC, 00666);
     struct stat b;
     fstat(artigos, &b);
     int id;
@@ -84,7 +84,7 @@ static void strCleaner() {
         pread(strings, buff, BUFFSIZE, a.name);
         updateName(id, buff);
     }
-
+    unlink("ree");
     close(artigos);
     close(newStrings);
     close(strings);
@@ -184,7 +184,7 @@ int main() {
                 id = atoi(str[1]);
                 int r = updateName(id, str[2]);
                 strings++;
-                if(r != -1 && strings && ((double) articles/strings < 0.8)) {
+                if(((double) articles)/strings < 0.8) {
                     strCleaner();
                     strings = articles;
                 }
