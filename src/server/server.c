@@ -99,7 +99,7 @@ ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     fstat(stock, &info);
     if(SIZEID(id) >= info.st_size) return -1;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
-    if(llabs(new_stock) <= s.stock) {
+    if(new_stock + (ssize_t)s.stock >= 0) {
         s.stock += new_stock;
         pwrite(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
         if(new_stock < 0) {
@@ -129,9 +129,9 @@ int cacheComp(const void* a, const void* b) {
 void articleSync(int wr) {
     if(!fork()) {
         mkfifo("/tmp/article.pipe", 00600);
+        int article;
+        article = open("/tmp/article.pipe", O_RDONLY);
         for(;;) {
-            int article;
-            article = open("/tmp/article.pipe", O_RDONLY);
             int read;
             char buff[BUFFSIZE];
             int newFile = 0;
@@ -147,8 +147,8 @@ void articleSync(int wr) {
             }
             if(newFile) 
                 initF();
-            close(article);
         }
+        close(article);
         rename("/dev/null", "/tmp/article.pipe");
         _exit(0);
     }
