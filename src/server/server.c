@@ -150,7 +150,7 @@ void articleSync(int wr) {
             close(article);
         }
         rename("/dev/null", "/tmp/article.pipe");
-        return;
+        _exit(0);
     }
 }
 
@@ -201,7 +201,7 @@ void articleCache(int rd, int wr) {
                         cache[i].preco = price;
                 }
             }
-        return;
+        _exit(0);
     }
 }
 
@@ -254,7 +254,7 @@ void server(int idk[2], int prices[2]) {
             close(rd);
         }
         unlink("/tmp/rd");
-        return;
+        _exit(0);
     }
 }
 
