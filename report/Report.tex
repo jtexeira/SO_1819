@@ -4,7 +4,7 @@
 \usepackage{hyperref}
 \usepackage{a4wide}
 \hypersetup{pdftitle={Sistema de Gestão de Vendas},
-pdfauthor={João Teixeira, Emanuel Rodrigues, José Ferreira},
+pdfauthor={José Ferreira},
 colorlinks=true,
 urlcolor=blue,
 linkcolor=black}
@@ -48,12 +48,11 @@ linkcolor=black}
 
 O objetivo deste projeto é construir um sistema de gestão de vendas modular,
 de forma a ser capaz de armazenar informações de vendas e relacionar produtos,
-clientes e vendas de forma eficiente, aplicando uma arquitetura \textit{Model, View,
-Controller} e conhecimentos sobre algoritmos e estruturas de dados. Como objetivo, 
+clientes e vendas de forma eficiente, aplicando uma arquitetura \textit{Cliente,
+Servidor} e conhecimentos sobre o Sistema Operativo Linux. Como objetivo, 
 é também necessário garantir o encapsulamento dos dados armazenados de forma
 a que não sejam possíveis alterações indevidas por agentes externos.\\
-Ao longo deste relatório vamos descrever as nossas abordagens a estes problemas e
-apresentar alguns testes de performance do nosso projeto final.
+Ao longo deste relatório vamos descrever as nossas abordagens a estes problemas.
 
 \chapter{Problema}
 Três ficheiros são fornecidos contendo informação sobre as transações de uma distribuidora:
@@ -256,17 +255,6 @@ Com a ferramenta \textit{memusage}, obtivemos o gráfico de uso de memória pres
 na figura \ref{img:memusage}, concluindo que as nossas estruturas preenchidas com
 os dados dados, estão a consumir, em pico, por volta dos 360MB.
 
-\section{Tempos de execução}
-
-Com recurso à biblioteca de C \textit{time.h}, efetuamos alguns benchmarks, obtendo
-a tabela \ref{tab:benches}, com os tempos médios de execução, com vários números 
-de vendas, concluindo assim que os tempos das queries são independentes do número de 
-vendas, tendo este fator apenas impacto nos tempos de load.
-\\
-Correndo a ferramenta \textit{gprof}, observamos que a função onde é gasto mais tempo
-é a função que cria faturas, pois esta tem cálculos demorados, o que levou a que não 
-a conseguíssemos otimizar.
-
 \chapter{Conclusão}
 
 Para concluir, conseguimos cumprir todos os requisitos propostos, conseguindo implementar
@@ -279,16 +267,6 @@ módulos, para no futuro, ser mais fácil de responder a novas queries caso foss
 necessário.
 
 \appendix
-
-\chapter{Uso de Memória}
-
-\begin{figure}[H]
-    \begin{center}
-        \includegraphics[width=1\textwidth]{memusage.png}\par\vspace{1cm}
-        \caption{Gráfico de uso de memória}
-        \label{img:memusage}
-    \end{center}
-\end{figure}
 
 \chapter{Tabela de Tempos de Execução}
 
