@@ -157,7 +157,7 @@ int main() {
     size_t strings, articles; 
     struct stat a;
     strings = articles = 0;
-    if(stat("artigos", &a))
+    if(!stat("artigos", &a))
         strings = articles = (a.st_size - sizeof(time_t)) / sizeof(Artigo); 
     while((read = readln(0, buff, BUFFSIZE))) {
         int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
@@ -184,7 +184,7 @@ int main() {
                 id = atoi(str[1]);
                 int r = updateName(id, str[2]);
                 strings++;
-                if(((double) articles)/strings < 0.8) {
+                if(!r && ((double) articles)/strings < 0.8) {
                     strCleaner();
                     strings = articles;
                 }
