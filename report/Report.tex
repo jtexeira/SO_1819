@@ -4,7 +4,7 @@
 \usepackage{hyperref}
 \usepackage{a4wide}
 \hypersetup{pdftitle={Sistema de Gestão de Stocks},
-pdfauthor={José Ferreira, João Teixeira},
+pdfauthor={José Ferreira, Emanuel Rodrigues, João Teixeira},
 colorlinks=true,
 urlcolor=blue,
 linkcolor=black}
@@ -22,7 +22,7 @@ linkcolor=black}
 
 \title{Gestão de Stocks\\ 
 \large Grupo Nº 2}
-\author{José Ferreira (A83683) \and João Teixeira (A85504)}
+\author{José Ferreira (A83683) \and Emanuel Rodrigues (A84776) \and João Teixeira (A85504)}
 \date{\today}
 
 \begin{center}
@@ -64,7 +64,7 @@ Ao longo deste relatório vamos descrever as nossas abordagens a estes problemas
 O modulo da Manutenção de artigos tem como função ser um `preçário'
 tendo informação dos diferentes produtos existentes, bem como o seu
 preço. Aqui é possível a criação de novos artigos, bem como a sua
-modificação. Sendo um modulo referente a manutenção, também e possível
+modificação. Sendo um modulo referente a manutenção, também é possível
 correr o agregador a pedido.
 
 \section{Servidor de Vendas}
@@ -75,7 +75,7 @@ e stocks existentes no momento.
 
 \section{Cliente de Vendas}
 
-O Cliente de Vendas e a interface que o utilizador final usa para
+O Cliente de Vendas é a interface que o utilizador final usa para
 realizar todas as vendas e pedidos de informação, comunicando com
 o servidor de vendas.
 
@@ -95,7 +95,7 @@ através do stdin. Embora a manutenção de vendas seja independente dos
 restantes módulos, este comunica com o Servidor de Vendas, caso este esteja
 a correr, de forma a manter a sincronização  da informação sobre o preço 
 e numero de artigos existentes em ambos os lados.\\
-Aqui também e possível correr o agregador sobre o ficheiro de vendas.
+Aqui também é possível correr o agregador sobre o ficheiro de vendas.
 
 \section{Servidor de Vendas}
 
@@ -108,10 +108,10 @@ em três diferentes processos:
         parte da Manutenção de Artigos (preços e criação de novos artigos), com a
         finalidade de manter, tanto o ficheiro de stocks, como a cache de preços
         sempre atualizada.
-    \item Um que contem a cache de preços.
-    \item Um responsável pela comunicação e tratamento dos pedidos dos clientes
+    \item Um que contém a cache de preços.
+    \item Um responsável pela comunicação e tratamento dos pedidos dos clientes.
 \end{itemize}
-Toda a comunicação com o servidor e feita com recurso a \textit{Named pipes},
+Toda a comunicação com o servidor é feita com recurso a \textit{Named pipes},
 existindo um pipe para os clientes efetuarem pedidos e um para o Manutenção
 de Artigos enviar as alterações que ocorram da parte dele.
 
@@ -122,7 +122,7 @@ O Cliente de Vendas interage com o utilizador a partir do \textit{stdin} e
 para o pipe de entrada que o Servidor cria, e recebe a resposta deste
 através de um pipe que ele cria, tendo como identificador o seu \textit{PID},
 de forma a garantir que as informações não são lidas por outro cliente.
-Para isto acontecer, para alem do pedido, e escrito no pipe de leitura do
+Para isto acontecer, para além do pedido, e escrito no pipe de leitura do
 servidor o identificador do cliente, que este esta preparado para conseguir
 responder no pipe adequado.
 
