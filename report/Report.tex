@@ -57,7 +57,7 @@ introduzida no sistema, bem como a consistencia da mesma pelos vários ficheiros
 e cache.\\
 Ao longo deste relatório vamos descrever as nossas abordagens a estes problemas.
 
-\chapter{Módulos e API}\label{chap:api}
+\chapter{Módulos}\label{chap:api}
 
 \section{Manutencao de Artigos}
 
@@ -94,13 +94,14 @@ e \textit{artigos}. O utilizador consegue adicionar e modifificar artigos
 atraves do stdin. Embora a manutencao de vendas seja independente dos 
 restantes modulos, este comunica com o Servidor de Vendas, caso este esteja
 a correr, de forma a manter a sincronizacao  da informacao sobre o preco 
-e numero de aritgos existentes em ambos os lados.
+e numero de aritgos existentes em ambos os lados.\\
+Aqui tambem e possivel correr o agregador sobre o ficheiro de vendas.
 
 \section{Servidor de Vendas}
 
 O Servidor de Vendas trata dos pedidos de todos os clientes, e trata de 
 manter informacao sobre o stock de cada artigo. Para manter essa informacao
-utiliza o ficheiro \textit{stocks}. O Servidor corre em background, consistindo
+utiliza o ficheiro \textit{stocks}. O Servidor corre em background, consistindoAPI
 em tres diferentes processos:
 \begin{itemize} 
     \item Um que trata da sincronizacao com a
@@ -110,11 +111,26 @@ em tres diferentes processos:
     \item Um que contem a cache de precos.
     \item Um responsavel pela comunicacao e tratamento dos pedidos dos clientes
 \end{itemize}
+Toda a comunicacao com o servidor e feita com recurso a \textit{Named pipes},
+existindo um pipe para os clientes efetuarem pedidos e um para o Manutencao
+de Artigos enviar as alteracoes que ocorram da parte dele.
 
-\section{Apresentação}
+\section{Cliente de Vendas}
 
-A apresentação contém apenas um módulo, o view. Este contém funções de apresentação genérica,
-tais como funções para apresentar array de strings e funções para apresentar matrizes de inteiros.
+O Cliente de Vendas interage com o utlizador a partir do \textit{stdin} e 
+\textit{stdout}, e interage com o Servidor de Vendas enviando informacao
+para o pipe de entrada que o Servidor cria, e recebe a resposta deste
+atraves de um pipe que ele cria, tendo como identificador o seu \textit{PID},
+de forma a garantir que as informacoes nao sao lidas por outro cliente.
+Para isto acontecer, para alem do pedido, e escrito no pipe de leitura do
+servidor o identificador do cliente, que este esta preparado para conseguir
+responder no pipe adquado.
+
+\section{Agregador}
+
+O agregador recebe input do \textit{stdin} linhas com o formato estipulado
+para o ficheiro \textit{vendas}, calculando os totais de cada artigo,
+devolvendo esses totais no mesmo formato pelo \textit{stdout}.
 
 \chapter{Estruturas de dados}
 
