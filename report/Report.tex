@@ -47,36 +47,36 @@ linkcolor=black}
 \chapter{Introdução}
 
 O objetivo deste projeto é construir um sistema de gestão de stocks,
-de forma a ser capaz de armazenar informacao de artigos, stocks e vendas,
+de forma a ser capaz de armazenar informação de artigos, stocks e vendas,
 aplicando uma arquitetura \textit{Cliente, Servidor} com recurso a \textit{System Calls}
-e varios processos, aplicando assim os conhecimentos sobre os Sistema Operativos 
+e vários processos, aplicando assim os conhecimentos sobre os Sistema Operativos 
 baseados em Unix adquiridos nas aulas desta UC\@.
 Como objetivo, é necessário implementar um sistema que permita a utilização concorrente de 
 um servidor por vários clientes, assegurando a conservação de toda a informação
-introduzida no sistema, bem como a consistencia da mesma pelos vários ficheiros
+introduzida no sistema, bem como a consistência desta entre os vários ficheiros
 e cache.\\
 Ao longo deste relatório vamos descrever as nossas abordagens a estes problemas.
 
 \chapter{Módulos}\label{chap:api}
 
-\section{Manutencao de Artigos}
+\section{Manutenção de Artigos}
 
-O modulo da Manutencao de artigos tem como funcao ser um `precario'
-tendo informacao dos diferentes produtos existentes, bem como o seu
-preco. Aqui e possivel a criacao de novos artigos, bem como a sua
-modificacao. Sendo um modulo referente a manutencao, tambem e possivel
+O modulo da Manutenção de artigos tem como função ser um `preçário'
+tendo informação dos diferentes produtos existentes, bem como o seu
+preço. Aqui é possível a criação de novos artigos, bem como a sua
+modificação. Sendo um modulo referente a manutenção, também e possível
 correr o agregador a pedido.
 
 \section{Servidor de Vendas}
 
 O Servidor de vendas trata todos os pedidos dos Clientes de vendas,
-quer sejam vendas ou entradas de stock, ou informacoes sobre o preco
+quer sejam vendas ou entradas de stock, ou informações sobre o preço
 e stocks existentes no momento.
 
 \section{Cliente de Vendas}
 
 O Cliente de Vendas e a interface que o utilizador final usa para
-realizar todas as vendas e pedidos de informacao, comunicando com
+realizar todas as vendas e pedidos de informação, comunicando com
 o servidor de vendas.
 
 \section{Agregador}
@@ -84,47 +84,47 @@ o servidor de vendas.
 O Agregador tem como finalidade agregar vendas, ou seja, juntar
 todas as vendas referentes ao mesmo artigo.
 
-\chapter{Arquitetura e Solucao do Projeto}
+\chapter{Arquitetura e Solução do Projeto}
 
-\section{Manutencao de Vendas}
+\section{Manutenção de Vendas}
 
-A Manutencao de Vendas trata de manter artigos, respetivos precos
-e nomes. Para manter essa informacao usa dois ficheiros, \textit{strings}
-e \textit{artigos}. O utilizador consegue adicionar e modifificar artigos
-atraves do stdin. Embora a manutencao de vendas seja independente dos 
-restantes modulos, este comunica com o Servidor de Vendas, caso este esteja
-a correr, de forma a manter a sincronizacao  da informacao sobre o preco 
-e numero de aritgos existentes em ambos os lados.\\
-Aqui tambem e possivel correr o agregador sobre o ficheiro de vendas.
+A Manutenção de Vendas trata de manter artigos, respetivos preços
+e nomes. Para manter essa informação usa dois ficheiros, \textit{strings}
+e \textit{artigos}. O utilizador consegue adicionar e modificar artigos
+através do stdin. Embora a manutenção de vendas seja independente dos 
+restantes módulos, este comunica com o Servidor de Vendas, caso este esteja
+a correr, de forma a manter a sincronização  da informação sobre o preço 
+e numero de artigos existentes em ambos os lados.\\
+Aqui também e possível correr o agregador sobre o ficheiro de vendas.
 
 \section{Servidor de Vendas}
 
 O Servidor de Vendas trata dos pedidos de todos os clientes, e trata de 
-manter informacao sobre o stock de cada artigo. Para manter essa informacao
-utiliza o ficheiro \textit{stocks}. O Servidor corre em background, consistindoAPI
-em tres diferentes processos:
+manter informação sobre o stock de cada artigo. Para manter essa informação
+utiliza o ficheiro \textit{stocks}. O Servidor corre em background, consistindo
+em três diferentes processos:
 \begin{itemize} 
-    \item Um que trata da sincronizacao com a
-        parte da Manutencao de Artigos (precos e criacao de novos artigos), com a
-        finalidade de manter, tanto o ficheiro de stocks, como a cache de precos
+    \item Um que trata da sincronização com a
+        parte da Manutenção de Artigos (preços e criação de novos artigos), com a
+        finalidade de manter, tanto o ficheiro de stocks, como a cache de preços
         sempre atualizada.
-    \item Um que contem a cache de precos.
-    \item Um responsavel pela comunicacao e tratamento dos pedidos dos clientes
+    \item Um que contem a cache de preços.
+    \item Um responsável pela comunicação e tratamento dos pedidos dos clientes
 \end{itemize}
-Toda a comunicacao com o servidor e feita com recurso a \textit{Named pipes},
-existindo um pipe para os clientes efetuarem pedidos e um para o Manutencao
-de Artigos enviar as alteracoes que ocorram da parte dele.
+Toda a comunicação com o servidor e feita com recurso a \textit{Named pipes},
+existindo um pipe para os clientes efetuarem pedidos e um para o Manutenção
+de Artigos enviar as alterações que ocorram da parte dele.
 
 \section{Cliente de Vendas}
 
-O Cliente de Vendas interage com o utlizador a partir do \textit{stdin} e 
-\textit{stdout}, e interage com o Servidor de Vendas enviando informacao
+O Cliente de Vendas interage com o utilizador a partir do \textit{stdin} e 
+\textit{stdout}, e interage com o Servidor de Vendas enviando informação
 para o pipe de entrada que o Servidor cria, e recebe a resposta deste
-atraves de um pipe que ele cria, tendo como identificador o seu \textit{PID},
-de forma a garantir que as informacoes nao sao lidas por outro cliente.
+através de um pipe que ele cria, tendo como identificador o seu \textit{PID},
+de forma a garantir que as informações não são lidas por outro cliente.
 Para isto acontecer, para alem do pedido, e escrito no pipe de leitura do
 servidor o identificador do cliente, que este esta preparado para conseguir
-responder no pipe adquado.
+responder no pipe adequado.
 
 \section{Agregador}
 
@@ -140,7 +140,7 @@ Numa abordagem inicial, na primeira fase do projeto, utilizamos arrays para
 guardar os dados. Para esta abordagem, observamos tempos de leitura e validação de ficheiros
 superiores a 5 minutos.\\
 Numa segunda abordagem, no inicio da segunda fase, optamos por utilizar 
-Árvores Auto-Balanceadas da biblioteca GLib, onde os tempos de leitura e validação 
+Árvores Auto Balanceadas da biblioteca GLib, onde os tempos de leitura e validação 
 dos ficheiros baixaram para cerca de 7 segundos, graças à pesquisa $O(\log N)$,
 operação mais utilizada na validação das vendas.\\
 Como abordagem final, implementamos Hashtables, também da biblioteca GLib.
@@ -163,7 +163,7 @@ tempos de resposta a queries.
 
 Durante a execução do nosso projeto, foram efetuados diversos testes ao código, com
 ferramentas como \textit{Valgrind}, para verificar a presença de \textit{memory 
-leaks}, \textit{memusage}, para fazer proffiling à memoria utilizada, \textit{gprof}
+leaks}, \textit{memusage}, para fazer profiling à memoria utilizada, \textit{gprof}
 para ver quais funções pesam mais na execução do programa, com vista a otimizar as
 partes mais lentas, e para medição dos tempos de execução utilizamos a biblioteca
 \textit{time.h}.
@@ -181,7 +181,7 @@ os dados dados, estão a consumir, em pico, por volta dos 360MB.
 \chapter{Conclusão}
 
 Para concluir, conseguimos cumprir todos os requisitos propostos, conseguindo implementar
-todos os módulos e estrutura-los como pedido, sendo assim capaz de responder a todas as 
+todos os módulos e estruturá-los como pedido, sendo assim capaz de responder a todas as 
 queries da forma que nos pareceu mais eficiente.\\
 Como trabalho futuro, gostaríamos de conseguir melhorar os tempos de load de ficheiros,
 no caso do ficheiro de um milhão de vendas, para tempos inferiores a 2 segundos, e
