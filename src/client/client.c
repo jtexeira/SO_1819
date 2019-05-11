@@ -27,5 +27,7 @@ int main() {
     }
     sprintf(buff, "/tmp/%d", getpid());
     unlink(buff);
+    close(wr);
+    close(rd);
     return 0;
 }

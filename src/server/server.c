@@ -130,8 +130,8 @@ void articleSync(int wr) {
     if(!fork()) {
         mkfifo("/tmp/article.pipe", 00600);
         int article;
-        article = open("/tmp/article.pipe", O_RDONLY);
         for(;;) {
+            article = open("/tmp/article.pipe", O_RDONLY);
             int read;
             char buff[BUFFSIZE];
             int newFile = 0;
@@ -141,14 +141,14 @@ void articleSync(int wr) {
                         newFile = 1;
                         break;
                     case 'p':
-                        write(wr, buff, read);
+                        while(write(wr, buff, read) == EAGAIN);
                         break;
                 }
             }
             if(newFile) 
                 initF();
+            close(article);
         }
-        close(article);
         rename("/dev/null", "/tmp/article.pipe");
         _exit(0);
     }

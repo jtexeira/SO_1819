@@ -159,8 +159,8 @@ int main() {
     strings = articles = 0;
     if(!stat("artigos", &a))
         strings = articles = (a.st_size - sizeof(time_t)) / sizeof(Artigo); 
+    int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
     while((read = readln(0, buff, BUFFSIZE))) {
-        int pipe = open("/tmp/article.pipe", O_WRONLY | O_NONBLOCK);
         switch(buff[0]) {
             case 'i':
                 str[0] = strtok(buff, " ");
@@ -204,8 +204,8 @@ int main() {
                 runAg();
                 break;
         }
-        close(pipe);
     }
+    close(pipe);
     unlink("tmp/article.pipe");
     return 0;
 }
