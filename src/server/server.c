@@ -233,6 +233,7 @@ void server(int idk[2], int prices[2]) {
                         write(wr, "\b\n", 2); 
                     else 
                         write(wr, info, size + 1);
+                    free(info);
                 }
                 else {
                     if(abc[0] >= 0 && abc[0] <= 9)

@@ -13,4 +13,7 @@ clean:
 	(cd manager && make clean)
 	(cd server && make clean)
 
+cleandb:
+	rm -rf artigos stocks strings vendas
+
 .PHONY: $(SUBDIRS)
