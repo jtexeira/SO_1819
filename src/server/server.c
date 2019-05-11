@@ -67,8 +67,8 @@ void initF() {
             }
             close(stock);
         }
-        close(artigos);
     }
+    close(artigos);
 }
 
 char* articleInfo(int rd, int wr, int id, int* size) {
