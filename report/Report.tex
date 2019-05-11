@@ -142,36 +142,27 @@ do Servidor em si, para nao causar atrasos a resposta dos pedidos de clientes.
 Assim, quando o servidor necessita da informacao sobre um preco de um artigo,
 envia o pedido atraves do pipe criado para o efeito.
 
-\chapter{Testes e Benchmarks}
+\chapter{Agregador Concorrente}
 
-Durante a execução do nosso projeto, foram efetuados diversos testes ao código, com
-ferramentas como \textit{Valgrind}, para verificar a presença de \textit{memory 
-leaks}, \textit{memusage}, para fazer profiling à memoria utilizada, \textit{gprof}
-para ver quais funções pesam mais na execução do programa, com vista a otimizar as
-partes mais lentas, e para medição dos tempos de execução utilizamos a biblioteca
-\textit{time.h}.
+O Agregador Concorrente, implementado na Manutencao de Artigos, consiste
+em correr o agregador sobre o ficheiro vendas, dividindo-o em partes, sendo
+capaz de agregar essas pequenas partes em paralelo e por fim agregar as 
+partes mais pequenas todas, tornando assim a agregacao deste ficheiro muito
+mais rapida.
 
-\section{Memória}
+\chapter{Sincronizacao Artigos Stock}
 
-Utilizando a ferramenta \textit{Valgrind}, conseguimos verificar que o programa
-corre sem \textit{memory leaks}, à exceção de algumas causadas pela biblioteca
-\textit{glib}.\\
-
-Com a ferramenta \textit{memusage}, obtivemos o gráfico de uso de memória presente
-na figura, concluindo que as nossas estruturas preenchidas com
-os dados dados, estão a consumir, em pico, por volta dos 360MB.
+Como a informacao contida no ficheiro Stocks tem que estar sempre atualizada
+com o ficheiro Artigos, ao ser criado o ficheiro Artigos, e guardada a 
+informacao de quando foi criado. Esta mesma marca temporaria e transcrita para
+o ficheiro Stocks na sua criacao. Para assegurar que o ficheiro Stocks
+tem a informacao referente ao ficheiro Artigos mais atualizado, caso essa marca
+difira entre ficheiros, o ficheiro Stocks e totalmente refeito. Tambem quando sao
+adicionados novos artigos, essas alteracoes sao comunicadas ao Servidor, que trata
+de atualizar o ficheiro. Quando o servidor nao esta a correr, essa verificacao
+e feita ao arranque do mesmo, tendo assim a certeza que as referencias a artigos
+do ficheiro Stocks sao corretas e as mais recentes.
 
 \chapter{Conclusão}
-
-Para concluir, conseguimos cumprir todos os requisitos propostos, conseguindo implementar
-todos os módulos e estruturá-los como pedido, sendo assim capaz de responder a todas as 
-queries da forma que nos pareceu mais eficiente.\\
-Como trabalho futuro, gostaríamos de conseguir melhorar os tempos de load de ficheiros,
-no caso do ficheiro de um milhão de vendas, para tempos inferiores a 2 segundos, e
-gostaríamos também de fazer ligeiras mudanças à estruturação das APIs de alguns dos 
-módulos, para no futuro, ser mais fácil de responder a novas queries caso fosse 
-necessário.
-
-\appendix
 
 \end{document}
