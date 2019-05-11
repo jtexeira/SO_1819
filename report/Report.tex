@@ -132,32 +132,15 @@ O agregador recebe input do \textit{stdin} linhas com o formato estipulado
 para o ficheiro \textit{vendas}, calculando os totais de cada artigo,
 devolvendo esses totais no mesmo formato pelo \textit{stdout}.
 
-\chapter{Estruturas de dados}
+\chapter{Cache de Precos}
 
-Como descrito no capítulo\ref{chap:api}, todas as nossas estruturas de dados consistem 
-em Hashtables da GLib, escolha feita após múltiplos testes empíricos de abordagens distintas.\\
-Numa abordagem inicial, na primeira fase do projeto, utilizamos arrays para 
-guardar os dados. Para esta abordagem, observamos tempos de leitura e validação de ficheiros
-superiores a 5 minutos.\\
-Numa segunda abordagem, no inicio da segunda fase, optamos por utilizar 
-Árvores Auto Balanceadas da biblioteca GLib, onde os tempos de leitura e validação 
-dos ficheiros baixaram para cerca de 7 segundos, graças à pesquisa $O(\log N)$,
-operação mais utilizada na validação das vendas.\\
-Como abordagem final, implementamos Hashtables, também da biblioteca GLib.
-Nesta, os valores não são armazenados de forma ordenada. No entanto,
-tal como concluímos com esta versão, com ferramentas tão otimizadas para a ordenação
-como o \textit{qsort()} da linguagem de programação C, a inserção ordenada acaba por ter
-um impacto demasiado negativo nos tempos de inserção.\\
-Por um lado, graças ao tempo de inserção e pesquisa $O(1)$, conseguimos reduzir
-o tempo de carregamento de ficheiros para menos de 4 segundos, como descrito
-na tabela, um melhoramento de aproximadamente 40\%.\\
-Por outro lado, graças à implementação otimizada das Hashtables na biblioteca em uso,
-percorrer todos os elementos desta, de acordo com os nossos testes, é tão rápido como
-na implementação anterior de AVLs. Tal resulta num tempo de resposta a queries
-inalterado quando comprado com a implementação anterior.\\
-Assim, com a utilização de Hashtables conseguimos uma melhoria de
-aproximadamente 40\% nos tempos de \textit{load} e manter os mesmos resultados nos
-tempos de resposta a queries.
+A cache de precos, parte integrante do Servidor de Vendas, existe para
+evitar consultar o ficheiro de Artigos a cada pedido do cliente.
+Para a manter sempre sincronizada com a informacao que existe na parte da
+Manutencao de artigos, optamos por implementar esta num processo distinto
+do Servidor em si, para nao causar atrasos a resposta dos pedidos de clientes.
+Assim, quando o servidor necessita da informacao sobre um preco de um artigo,
+envia o pedido atraves do pipe criado para o efeito.
 
 \chapter{Testes e Benchmarks}
 
