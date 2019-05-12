@@ -95,8 +95,12 @@ e \textit{artigos}. O utilizador consegue adicionar e modificar artigos
 através do stdin. Embora a manutenção de vendas seja independente dos 
 restantes módulos, este comunica com o Servidor de Vendas, caso este esteja
 a correr, de forma a manter a sincronização  da informação sobre o preço 
-e numero de artigos existentes em ambos os lados.\\
-Aqui também é possível correr o agregador sobre o ficheiro de vendas.
+e numero de artigos existentes em ambos os lados. Para manter o tamanho
+do ficheiro de vendas o mais pequeno possível, foi implementado um compactador
+para esse ficheiro, garantindo assim que nao existem grandes quantidades
+de dados desatualizados.\\
+Aqui também é possível correr o agregador concorrente sobre o ficheiro 
+de vendas.
 
 \section{Servidor de Vendas}
 
