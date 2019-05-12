@@ -13,7 +13,7 @@
 #include <signal.h>
 
 #ifdef __APPLE__
-    #define st_mtimespec st_tim
+    #define st_mtim st_mtimespec
 #endif
 
 static int addArticle(char* name, double price) {
