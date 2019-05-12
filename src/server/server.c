@@ -10,7 +10,7 @@
 #include <sys/inotify.h>
 
 #define CACHESIZE 50
-#define SIZEID(id) (__off_t)((id * sizeof(Stock)) + sizeof(time_t))
+#define SIZEID(id) (off_t)((id * sizeof(Stock)) + sizeof(time_t))
 
 typedef struct stock {
     int codigo;
@@ -32,10 +32,12 @@ void initF() {
     int nArtigos = (a.st_size - sizeof(time_t)) / sizeof(Artigo);
     time_t articleCreate;
     read(artigos, &articleCreate, sizeof(time_t));
-    if(stat("stocks", &a)) {
+    if(stat("stocks", &a) == -1) {
         int stock = open("stocks", O_CREAT | O_WRONLY | O_APPEND, 0600);
         write(stock, &articleCreate, sizeof(time_t));
+                write(2, "ree\n", 4);
         for(i = 0; i < nArtigos; i++) {
+                write(2, "cc1\n", 4);
             new.codigo = i;
             new.stock = 0;
             write(stock, &new, sizeof(Stock));
@@ -47,20 +49,22 @@ void initF() {
         time_t stockDate;
         read(stock, &stockDate, sizeof(time_t));
         close(stock);
+        int nStock = (a.st_size - sizeof(time_t)) / sizeof(Stock);
         if(stockDate != articleCreate) {
             stock = open("stocks", O_WRONLY | O_TRUNC | O_APPEND);
             write(stock, &articleCreate, sizeof(time_t));
             for(i = 0; i < nArtigos; i++) {
+                write(2, "cc2\n", 4);
                 new.codigo = i;
                 new.stock = 0;
                 write(stock, &new, sizeof(Stock));
             }
             close(stock);
         }
-        int nStock = (a.st_size - sizeof(time_t)) / sizeof(Stock);
-        if(nStock < nArtigos) { 
+        else if(nStock < nArtigos) { 
             stock = open("stocks", O_WRONLY | O_APPEND);
             for(i = nStock; i < nArtigos; i++) {
+                write(2, "cc3\n", 4);
                 new.codigo = i;
                 new.stock = 0;
                 write(stock, &new, sizeof(Stock));
