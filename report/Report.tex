@@ -163,6 +163,40 @@ de actualizar o ficheiro. Quando o servidor não esta a correr, essa verificaç�
 e feita ao arranque do mesmo, tendo assim a certeza que as referencias a artigos
 do ficheiro Stocks são corretas e as mais recentes.
 
+\section{Testes}
+
+\chapter{Manutenção de Artigos}
+Para testar a Manutenção de Artigos foram criados dois programas em Python.
+O primeiro gera input em que as instruções dadas são válidas mas aleatórias.
+O segundo gera um conjunto de instruções que é válido e é possível testar se estão
+a ser bem interpretadas.
+\begin{itemize} 
+    \item Adiciona N produtos (passados como argumento), em que o nome é igual ao id do
+        produto e o preço é igual a 0.
+    \item Altera o nome de todos os produtos para 10 vezes o seu id.
+    \item Altera o preço de todos os produtos para ser igual ao seu id.
+\end{itemize}
+Assim, para ver se o resultado é o esperado basta verificar se para um dado id
+este tem preço igual a id e tem um nome igual a 10 vezes o id.
+
+\chapter{Cliente de Vendas}
+Para testar o Cliente de Vendas foram criados dois programas em Python que
+seguem a mesma lógica dos criados para a Manutenção de Artigos.
+O primeiro gera input em que as instruções dadas são válidas mas aleatórias.
+O segundo gera um conjunto de instruções que é válido e é possível testar se estão
+a ser bem interpretadas.
+\begin{itemize} 
+    \item Acede a todos os ids.
+    \item Adiciona ao stock 100 artigos de cada artigo.
+    \item Remove do stock 10 artigos de cada artigo.
+\end{itemize}
+Assim, para verificar se o resultado é o esperado podemos confirmar se para um dado
+id o stock disponível é igual a 90.
+Na mesma veia, se vários Clientes de Vendas correrem em concorrência, para validar
+os resultados é possível verificar se a fórmula stock / 90 = N, sendo o stock o stock
+disponível para um dado artigo e N o número de clientes de vendas que foram corridos
+em concorrência, é verdade.
+
 \chapter{Conclusão}
 
 \end{document}
