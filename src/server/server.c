@@ -127,7 +127,7 @@ int cacheComp(const void* a, const void* b) {
 
 void articleSync(int wr) {
     if(!fork()) {
-        mkfifo("/tmp/article.pipe", 00600);
+        mkfifo("/tmp/article.pipe", 0600);
         int article;
         for(;;) {
             article = open("/tmp/article.pipe", O_RDONLY);
