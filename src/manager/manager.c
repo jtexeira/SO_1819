@@ -48,7 +48,7 @@ static int updateName(int id, char* new_name) {
     strings = open("strings", O_WRONLY | O_APPEND);
     artigos = open("artigos", O_RDWR);
     fstat(artigos, &b);
-    if(SPOT(id) >= b.st_size) return -1;
+    if(SPOT(id) >= b.st_size || id < 0) return -1;
     pread(artigos, &a, sizeof(Artigo), SPOT(id));
     fstat(strings, &b);
     a.name = b.st_size;
@@ -64,7 +64,7 @@ static int updateArticle(int id, double new_price) {
     int artigos = open("artigos", O_RDWR);
     struct stat b;
     fstat(artigos, &b);
-    if(SPOT(id) >= b.st_size) return -1;
+    if(SPOT(id) >= b.st_size || id < 0) return -1;
     Artigo a;
     pread(artigos, &a, sizeof(Artigo), SPOT(id));
     a.price = new_price;

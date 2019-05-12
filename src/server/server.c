@@ -74,7 +74,7 @@ char* articleInfo(int rd, int wr, int id, int* size) {
     int stock = open("stocks", O_RDONLY);
     struct stat info;
     fstat(stock, &info);
-    if(SIZEID(id) >= info.st_size) return NULL;
+    if(SIZEID(id) >= info.st_size || id < 0) return NULL;
     char* buff = malloc(BUFFSIZE);
     Stock s;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
@@ -96,7 +96,7 @@ ssize_t updateStock(int rd, int wr, int id, ssize_t new_stock) {
     Stock s;
     struct stat info;
     fstat(stock, &info);
-    if(SIZEID(id) >= info.st_size) return -1;
+    if(SIZEID(id) >= info.st_size || id < 0) return -1;
     pread(stock, &s, sizeof(Stock), id * sizeof(Stock) + sizeof(time_t));
     if(new_stock + (ssize_t)s.stock >= 0) {
         s.stock += new_stock;

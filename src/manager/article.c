@@ -8,7 +8,7 @@ double getArticlePrice(int id) {
     int artigos = open("artigos", O_RDONLY);
     struct stat b;
     fstat(artigos, &b);
-    if(SPOT(id) >= b.st_size) return -1;
+    if(SPOT(id) >= b.st_size || id < 0) return -1;
     pread(artigos, &a, sizeof(Artigo), SPOT(id));
     close(artigos);
     return a.price;
