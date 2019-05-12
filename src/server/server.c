@@ -7,7 +7,6 @@
 #include "../utils/utils.h"
 #include <stdlib.h>
 #include <string.h>
-#include <sys/inotify.h>
 
 #define CACHESIZE 50
 #define SIZEID(id) (off_t)((id * sizeof(Stock)) + sizeof(time_t))

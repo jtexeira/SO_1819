@@ -12,6 +12,10 @@
 #include <fcntl.h>
 #include <signal.h>
 
+#ifdef __APPLE__
+    #define st_mtimespec st_tim
+#endif
+
 static int addArticle(char* name, double price) {
     int strings, artigos, id;
     strings = open("strings", O_WRONLY | O_APPEND | O_CREAT, 00666);
