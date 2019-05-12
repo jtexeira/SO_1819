@@ -67,7 +67,8 @@ static int updateArticle(int id, double new_price) {
     if(SPOT(id) >= b.st_size || id < 0) return -1;
     Artigo a;
     pread(artigos, &a, sizeof(Artigo), SPOT(id));
-    a.price = new_price;
+    if(new_price) 
+        a.price = new_price;
     pwrite(artigos, &a, sizeof(Artigo), SPOT(id));
     close(artigos);
     return 0;
