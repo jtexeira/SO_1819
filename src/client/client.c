@@ -25,7 +25,7 @@ int main() {
         write(1, buff, read);
         memset(buff, 0, sizeof(char) * 130);
     }
-    sprintf(buff, "/tmp/%d", getpid());
+    sprintf(buff, "/tmp/%d.pipe", getpid());
     unlink(buff);
     close(wr);
     close(rd);

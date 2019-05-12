@@ -206,6 +206,6 @@ int main() {
         }
     }
     close(pipe);
-    unlink("tmp/article.pipe");
+    unlink("/tmp/article.pipe");
     return 0;
 }

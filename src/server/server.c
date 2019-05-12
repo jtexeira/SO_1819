@@ -149,7 +149,7 @@ void articleSync(int wr) {
                 initF();
             close(article);
         }
-        rename("/dev/null", "/tmp/article.pipe");
+        unlink("/tmp/article.pipe");
         _exit(0);
     }
 }
