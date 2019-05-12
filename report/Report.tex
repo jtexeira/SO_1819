@@ -132,36 +132,36 @@ O agregador recebe input do \textit{stdin} linhas com o formato estipulado
 para o ficheiro \textit{vendas}, calculando os totais de cada artigo,
 devolvendo esses totais no mesmo formato pelo \textit{stdout}.
 
-\chapter{Cache de Precos}
+\chapter{Cache de Preços}
 
-A cache de precos, parte integrante do Servidor de Vendas, existe para
+A cache de preços, parte integrante do Servidor de Vendas, existe para
 evitar consultar o ficheiro de Artigos a cada pedido do cliente.
-Para a manter sempre sincronizada com a informacao que existe na parte da
-Manutencao de artigos, optamos por implementar esta num processo distinto
-do Servidor em si, para nao causar atrasos a resposta dos pedidos de clientes.
-Assim, quando o servidor necessita da informacao sobre um preco de um artigo,
-envia o pedido atraves do pipe criado para o efeito.
+Para a manter sempre sincronizada com a informação que existe na parte da
+Manutenção de artigos, optamos por implementar esta num processo distinto
+do Servidor em si, para não causar atrasos a resposta dos pedidos de clientes.
+Assim, quando o servidor necessita da informação sobre um preço de um artigo,
+envia o pedido através do pipe criado para o efeito.
 
 \chapter{Agregador Concorrente}
 
-O Agregador Concorrente, implementado na Manutencao de Artigos, consiste
-em correr o agregador sobre o ficheiro vendas, dividindo-o em partes, sendo
+O Agregador Concorrente, implementado na Manutenção de Artigos, consiste
+em correr o agregador sobre o ficheiro vendas, dividindo o em partes, sendo
 capaz de agregar essas pequenas partes em paralelo e por fim agregar as 
-partes mais pequenas todas, tornando assim a agregacao deste ficheiro muito
-mais rapida.
+partes mais pequenas todas, tornando assim a agregação deste ficheiro muito
+mais rápida.
 
-\chapter{Sincronizacao Artigos Stock}
+\chapter{Sincronização Artigos Stock}
 
-Como a informacao contida no ficheiro Stocks tem que estar sempre atualizada
+Como a informação contida no ficheiro Stocks tem que estar sempre atualizada
 com o ficheiro Artigos, ao ser criado o ficheiro Artigos, e guardada a 
-informacao de quando foi criado. Esta mesma marca temporaria e transcrita para
-o ficheiro Stocks na sua criacao. Para assegurar que o ficheiro Stocks
-tem a informacao referente ao ficheiro Artigos mais atualizado, caso essa marca
-difira entre ficheiros, o ficheiro Stocks e totalmente refeito. Tambem quando sao
-adicionados novos artigos, essas alteracoes sao comunicadas ao Servidor, que trata
-de atualizar o ficheiro. Quando o servidor nao esta a correr, essa verificacao
+informação de quando foi criado. Esta mesma marca temporária e transcrita para
+o ficheiro Stocks na sua criação. Para assegurar que o ficheiro Stocks
+tem a informação referente ao ficheiro Artigos mais atualizado, caso essa marca
+difira entre ficheiros, o ficheiro Stocks e totalmente refeito. Também quando são
+adicionados novos artigos, essas alterações são comunicadas ao Servidor, que trata
+de actualizar o ficheiro. Quando o servidor não esta a correr, essa verificação
 e feita ao arranque do mesmo, tendo assim a certeza que as referencias a artigos
-do ficheiro Stocks sao corretas e as mais recentes.
+do ficheiro Stocks são corretas e as mais recentes.
 
 \chapter{Conclusão}
 
