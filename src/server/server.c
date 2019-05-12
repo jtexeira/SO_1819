@@ -35,9 +35,7 @@ void initF() {
     if(stat("stocks", &a) == -1) {
         int stock = open("stocks", O_CREAT | O_WRONLY | O_APPEND, 0600);
         write(stock, &articleCreate, sizeof(time_t));
-                write(2, "ree\n", 4);
         for(i = 0; i < nArtigos; i++) {
-                write(2, "cc1\n", 4);
             new.codigo = i;
             new.stock = 0;
             write(stock, &new, sizeof(Stock));
@@ -54,7 +52,6 @@ void initF() {
             stock = open("stocks", O_WRONLY | O_TRUNC | O_APPEND);
             write(stock, &articleCreate, sizeof(time_t));
             for(i = 0; i < nArtigos; i++) {
-                write(2, "cc2\n", 4);
                 new.codigo = i;
                 new.stock = 0;
                 write(stock, &new, sizeof(Stock));
@@ -64,7 +61,6 @@ void initF() {
         else if(nStock < nArtigos) { 
             stock = open("stocks", O_WRONLY | O_APPEND);
             for(i = nStock; i < nArtigos; i++) {
-                write(2, "cc3\n", 4);
                 new.codigo = i;
                 new.stock = 0;
                 write(stock, &new, sizeof(Stock));
