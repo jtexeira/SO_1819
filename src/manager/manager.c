@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <ctype.h>
 
 #ifdef __APPLE__
     #define st_mtim st_mtimespec
@@ -174,6 +175,7 @@ int main() {
                 if(i != 2 || !str[2]) break;
                 while(write(pipe, buff, read) == EAGAIN);
                 char* name = str[1];
+                if(!isdigit(str[2][0])) break;
                 double price = atof(str[2]);
                 int id = addArticle(name, price);
                 sprintf(buff, "%d\n", id);
@@ -186,6 +188,7 @@ int main() {
                 str[1] = strtok(NULL, " ");
                 str[2] = strtok(NULL, " ");
                 if(!str[1] || !str[2]) break;
+                if(!isdigit(str[1][0])) break;
                 id = atoi(str[1]);
                 int r = updateName(id, str[2]);
                 strings++;
@@ -200,6 +203,8 @@ int main() {
                 str[1] = strtok(NULL, " ");
                 str[2] = strtok(NULL, " ");
                 if(!str[1] || !str[2]) break;
+                if(!isdigit(str[1][0])) break;
+                if(!isdigit(str[2][0])) break;
                 id = atoi(str[1]);
                 price = atof(str[2]);
                 updateArticle(id, price);
